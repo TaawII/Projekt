@@ -1,0 +1,15 @@
+.post{
+    width: 100%;
+    min-height: 100px;
+    border-bottom: 1px solid gray;
+}
+.userPost{
+    padding: 5px;
+}
+.textPost{
+    padding: 5px;
+}
+.comPost{
+    padding: 5px;
+    text-align: right;
+}

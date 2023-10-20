@@ -1,0 +1,24 @@
+.panel {
+    border-right: 1px solid gray;
+    flex: 0.2;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 45px;
+}
+
+.przyciskWpis {
+    background-color: rgb(249, 176, 19) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 900 !important;
+    text-transform: inherit !important; 
+    border-radius: 30px !important;
+    height: 50px !important;
+    margin-top: 20px !important;
+}
+
+/* wyłącza podkreślenie do linków + nie nadpisuje oryginalnego koloru czcionki */
+a {
+    text-decoration: none;
+    color: inherit;
+}

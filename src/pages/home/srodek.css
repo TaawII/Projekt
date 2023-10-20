@@ -1,0 +1,31 @@
+.srodek {
+    flex: 0.6;
+    border-right: 1px solid gray;
+    overflow-y: scroll;
+    min-width: fit-content;
+}
+
+.srodek-naglowek {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 100;
+    padding: 15px 20px;
+    border-bottom: 1px solid gray;
+}
+
+
+.srodek-naglowek > h2 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* wyłączenie widoku scrollowania */
+.srodek::-webkit-scrollbar {
+    display: none
+}
+
+.srodek {
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
