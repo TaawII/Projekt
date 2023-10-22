@@ -5,9 +5,6 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { auth } from "../../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "./../../context/AuthContext";
-//74
-import { useUser } from '../home/user.js';
-//4W
 
 const Login = () => {
   const [inputs, setInputs] = useState({
@@ -19,9 +16,6 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { dispatch } = useContext(AuthContext);
-  //74
-  const { setUser } = useUser();
-  //4W
 
   const handleToggle = (e) => {
     setToggleEye(!toggleEye);
@@ -40,9 +34,6 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           dispatch({ type: "LOGIN_SUCCESS", payload: user });
-          //74
-          setUser(user);
-          //4W
           navigate("/");
         }
       );
