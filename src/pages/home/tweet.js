@@ -29,7 +29,7 @@ class OpublikujForm extends React.Component {
           };
         if(addNewPost('wpisy', newPostData))
         {
-            window.location.reload();
+            window.location.reload(); 
         }
       this.setState({ PostTresc: ''});
       event.preventDefault();

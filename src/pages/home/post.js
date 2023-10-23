@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext, createContext } from 'react';
 import './post.css';
 import { getPost, addCom, updatePost, deletePost} from '../../firebase';
 import { doc } from 'firebase/firestore/lite';
+import { AuthContext } from '../../context/AuthContext';
 
 function DeleteButton({ postId }) {
     const DeletePost = () => {
@@ -94,6 +95,22 @@ function CommentForm({ postId }) {
 }
 //B
 
+function UserValidation(postData)
+{
+    const { currentUser } = useContext(AuthContext);
+    const pData = postData.postData;
+    if(pData.UID == currentUser.uid)
+    {
+        return(
+            <div>
+                <EditForm  postId={pData.id} postTresc={pData.Tresc}/>
+                <DeleteButton postId={pData.id}/>
+            </div>
+            )
+    }
+    return null;
+}
+
 //Pobieranie z bazy wszystkich postów
 function Post() {
     const [postList, setPostList] = useState([]);
@@ -120,8 +137,7 @@ function Post() {
                         <div className='userPost'>
                             {post.Pseudonim}
                             <div className="postUD">
-                                <EditForm  postId={post.id} postTresc={post.Tresc}/>
-                                <DeleteButton postId={post.id}/>
+                                <UserValidation postData={post}/>
                             </div>
                         </div>
                         <div className='textPost'>
