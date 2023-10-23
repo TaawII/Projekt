@@ -1,6 +1,98 @@
 import React, { useEffect, useState } from 'react';
 import './post.css';
-import { getPost} from '../../firebase';
+import { getPost, addCom, updatePost, deletePost} from '../../firebase';
+import { doc } from 'firebase/firestore/lite';
+
+function DeleteButton({ postId }) {
+    const DeletePost = () => {
+        if(deletePost('wpisy', postId))
+        {
+            window.location.reload();
+        }
+    };
+    return (
+        <div>
+            <button onClick={DeletePost}>Usuń wpis</button>
+        </div>
+    )
+}
+
+function EditForm({ postId, postTresc }) {
+    const [comment, setComment] = useState(postTresc);
+  
+    const HandleCommentChange = (event) => {
+        setComment(event.target.value);
+    };
+
+    const [isVisible, setIsVisible] = useState(false);
+
+    const ToggleVisibility = () => {
+        setComment(postTresc);
+        setIsVisible(!isVisible);
+      };
+
+    const ExitPost = () => {
+        ToggleVisibility();
+    }
+    const SavePost = () => {
+        console.log('Wprowadzony komentarz dla postu', postId, ':', comment);
+        const newData = {
+            Tresc: comment,
+        }
+        if(updatePost('wpisy', postId, newData))
+        {
+            ToggleVisibility();
+            window.location.reload();
+        }
+    };
+
+
+    return (
+        <div>
+            <button onClick={ToggleVisibility}>Edytuj Wpis</button>
+            {isVisible ? (
+                <div className="modal">
+                    <div className="modal-content">
+                        <textarea value={comment} onChange={HandleCommentChange}></textarea>
+                        <div className="modal-button">
+                            <button onClick={SavePost} className="save">Zapisz</button>
+                            <button onClick={ExitPost} className="exit">Anuluj</button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
+        </div>
+    )
+}
+
+//P
+function CommentForm({ postId }) {
+    const [comment, setComment] = useState('');
+  
+    const HandleCommentChange = (event) => {
+      setComment(event.target.value);
+    };
+  
+    const SendComment = (event) => {
+      event.preventDefault();
+      var ComData =
+      {
+        PostId: postId,
+        ComText: comment,
+        Timestamp: new Date(),
+      }
+      addCom('com', ComData);
+      console.log('Wprowadzony komentarz dla postu', postId, ':', comment);
+    };
+  
+    return (
+      <form onSubmit={SendComment}>
+        <input type="text" value={comment} onChange={HandleCommentChange} />
+        <button type="submit">Koment</button>
+      </form>
+    );
+}
+//B
 
 //Pobieranie z bazy wszystkich postów
 function Post() {
@@ -24,15 +116,19 @@ function Post() {
         <div className="post">
             {
                 postList.map((post, index) => (
-                    <div key={index}>
+                    <div id={post.id} key={index}>
                         <div className='userPost'>
-                        {post.Imie + " (" + post.Pseudonim +")"}
+                            {post.Pseudonim}
+                            <div className="postUD">
+                                <EditForm  postId={post.id} postTresc={post.Tresc}/>
+                                <DeleteButton postId={post.id}/>
+                            </div>
                         </div>
                         <div className='textPost'>
-                        {post.Tresc}
+                            {post.Tresc}
                         </div>
                         <div className='comPost'>
-                            <button>Koment</button>
+                            <CommentForm postId={post.id} />
                         </div>
                     </div>
                 ))

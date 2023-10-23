@@ -23,13 +23,14 @@ class OpublikujForm extends React.Component {
         const { currentUser } = this.context;
         var newPostData = {
             UID: currentUser.uid,
-            Imie: 'Imie',
             Pseudonim: currentUser.displayName,
             Tresc: this.state.PostTresc,
             Timestamp: new Date(),
           };
-      addNewPost('wpisy', newPostData);
-      alert('Dodano wpis: ' + this.state.PostTresc);
+        if(addNewPost('wpisy', newPostData))
+        {
+            window.location.reload();
+        }
       this.setState({ PostTresc: ''});
       event.preventDefault();
     }
@@ -37,7 +38,6 @@ class OpublikujForm extends React.Component {
     render() {
       return (
         <div>
-            {}
             <form onSubmit={this.handleSubmit} autoComplete="off">
                 <div className="tweet_pole">
                     <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
