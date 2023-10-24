@@ -3,6 +3,8 @@ import './post.css';
 import { getPost, addCom, updatePost, deletePost} from '../../firebase';
 import { doc } from 'firebase/firestore/lite';
 import { AuthContext } from '../../context/AuthContext';
+import { RenderCom}  from './com.js'
+
 
 function DeleteButton({ postId }) {
     const DeletePost = () => {
@@ -145,6 +147,11 @@ function Post() {
                         </div>
                         <div className='comPost'>
                             <CommentForm postId={post.id} />
+                            <div className='comPostRender'>
+                                {
+                                    <RenderCom id={post.id}/>
+                                }
+                            </div>
                         </div>
                     </div>
                 ))

@@ -2,7 +2,7 @@
 import { initializeApp} from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import { doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit} from 'firebase/firestore/lite';
+import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit} from 'firebase/firestore/lite';
 import { Collections } from "@mui/icons-material";
 
 const firebaseConfig = {
@@ -73,6 +73,26 @@ async function addCom(collName, comData) {
 
 export { getPost, addNewPost, addCom, updatePost, deletePost};
 //4W
+
+//P
+//Dodać sortowanie od najnowszego
+async function GetCom(collectionName, idWpisu) {
+  const Colection = collection(db, collectionName);
+  const q = query(Colection, where("PostId", "==", idWpisu),limit(2));
+  const Snapshot = await getDocs(q);
+  
+  const List = Snapshot.docs.map((doc) => {
+    const docID = doc.id;
+    const docData = doc.data();
+    return { id: docID, ...docData };
+  });
+
+  console.log(List);
+  return List;
+}
+export {GetCom}
+//B
+
 export const auth = getAuth(app);
 export const storage = getStorage();
 export default app;
