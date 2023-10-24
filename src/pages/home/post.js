@@ -4,21 +4,25 @@ import { getPost, addCom, updatePost, deletePost} from '../../firebase';
 import { doc } from 'firebase/firestore/lite';
 import { AuthContext } from '../../context/AuthContext';
 import { RenderCom}  from './com.js'
+import DeleteIcon from '@mui/icons-material/Delete';
+import { IconButton } from '@mui/material';
 
 
 function DeleteButton({ postId }) {
     const DeletePost = () => {
-        if(deletePost('wpisy', postId))
-        {
-            window.location.reload();
-        }
+      if (deletePost('wpisy', postId)) {
+        window.location.reload();
+      }
     };
+  
     return (
-        <div>
-            <button onClick={DeletePost}>Usuń wpis</button>
-        </div>
-    )
-}
+      <div>
+        <IconButton onClick={DeletePost} color="primary">
+          <DeleteIcon />
+        </IconButton>
+      </div>
+    );
+  }
 
 function EditForm({ postId, postTresc }) {
     const [comment, setComment] = useState(postTresc);
