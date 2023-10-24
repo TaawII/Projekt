@@ -3,7 +3,7 @@ import { GetCom, deletePost} from '../../firebase';
 import React, { useEffect, useState, useContext, createContext } from 'react';
 
 function Com(){
-//testdddddjjjj
+//testdddddjjjjhh
 }
   //test  
 function DeleteButton( ComId ) {
