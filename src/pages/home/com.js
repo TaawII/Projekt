@@ -5,7 +5,7 @@ import React, { useEffect, useState, useContext, createContext } from 'react';
 function Com(){
 
 }
-    
+  //test  
 function DeleteButton( ComId ) {
     console.log(ComId.ComId);
     const DeletePost = () => {
