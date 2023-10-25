@@ -1,7 +1,7 @@
 // połączenie z bazą danych na Firebase
 import { initializeApp} from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getStorage } from "firebase/storage";
+import { getAuth, updateProfile } from "firebase/auth";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit} from 'firebase/firestore/lite';
 import { Collections } from "@mui/icons-material";
 
@@ -95,4 +95,20 @@ export {GetCom}
 
 export const auth = getAuth(app);
 export const storage = getStorage();
+
+//Dodawanie avatara do profilu
+export async function uploadAvatar(file, currentUser, setLoading) {
+  const fileRef = ref(storage, currentUser.uid + '.png');
+
+  setLoading(true);
+
+  const snapshot = await uploadBytes(fileRef, file);
+  const photoURL = await getDownloadURL(fileRef);
+
+  updateProfile(currentUser, {photoURL});
+
+  setLoading(false);
+  alert("Plik został wysłany");
+} 
+
 export default app;

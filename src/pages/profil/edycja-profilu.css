@@ -1,0 +1,40 @@
+.infoProfil {
+    flex: 0.6;
+    border-right: 1px solid gray;
+    overflow-y: scroll;
+    min-width: fit-content;
+}
+
+.naglowek {
+    margin: auto;
+    text-align: center;
+    border-bottom: 1px solid black;
+}
+
+.tloProfilu {
+    height: 281.25px;
+    width: 100%;
+}
+
+.info {
+    border-bottom: 1px solid black;
+}
+
+.avatar {
+    vertical-align: middle;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border-width: 5px;
+    border-color: gray;
+    border-style: outset;
+    margin-left: 20px;
+    margin-right: 15px;
+    margin-top: 10px;
+    margin-bottom: 20px; 
+}
+
+.displayName {
+    font-weight: bold;
+    font-size: 30px;
+}
