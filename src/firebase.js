@@ -33,41 +33,41 @@ async function getPost(collectionName) {
   return List;
 }
 
-async function addNewPost(collectionName, postData) {
+function addNewPost(collectionName, postData) {
   const postsCol = collection(db, collectionName);
   try {
-    const newPostRef = await addDoc(postsCol, postData);
+    const newPostRef = addDoc(postsCol, postData);
     return true;
   } catch (error) {
     return false;
   }
 }
 
-async function updatePost(collectionName, documentId, newData)
+function updatePost(collectionName, documentId, newData)
 {
   const documentRef = doc(db, collectionName, documentId);
   try {
-    await updateDoc(documentRef, newData);
+    updateDoc(documentRef, newData);
     return true;
   } catch (error) {
     return false;
   }
 }
 
-async function deletePost(collectionName, documentId)
+function deletePost(collectionName, documentId)
 {
   const deleteDocument  = doc(db, collectionName, documentId);
   try {
-    await deleteDoc(deleteDocument);
+    deleteDoc(deleteDocument);
     return true;
   } catch (error) {
     return false;
   }
 }
 
-async function addCom(collName, comData) {
+function addCom(collName, comData) {
   const postsCol = collection(db, collName);
-  const newPostRef = await addDoc(postsCol, comData);
+  const newPostRef = addDoc(postsCol, comData);
   console.log('Nowy dokument do bazy: '+ collName +' został dodany z ID:', newPostRef.id);
 }
 
