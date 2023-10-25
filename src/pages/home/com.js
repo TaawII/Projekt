@@ -1,7 +1,7 @@
-import { collection } from "firebase/firestore/lite";
 import { GetCom, deletePost } from '../../firebase';
 import React, { useEffect, useState } from 'react';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import DeleteIcon from '@mui/icons-material/Delete';
+import './com.css';
 
 function Com({ ComId }) {
   const [isOptionsVisible, setIsOptionsVisible] = useState(false);
@@ -25,14 +25,14 @@ function Com({ ComId }) {
   return (
     <div>
       <div onClick={toggleOptions}>
-        <ArrowDropDownIcon />
+        <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
+        {isOptionsVisible && (
+          <div>
+            <button onClick={handleEditClick}>Edytuj</button>
+            <button onClick={handleDeleteClick}>Usuń</button>
+          </div>
+        )}
       </div>
-      {isOptionsVisible && (
-        <div>
-          <button onClick={handleEditClick}>Edytuj</button>
-          <button onClick={handleDeleteClick}>Usuń</button>
-        </div>
-      )}
     </div>
   );
 }

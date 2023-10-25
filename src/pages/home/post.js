@@ -1,3 +1,4 @@
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import React, { useEffect, useState, useContext } from 'react';
 import './post.css';
 import { getPost, addCom, updatePost, deletePost } from '../../firebase';
@@ -7,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconButton, Menu, MenuItem } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 
 function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -14,6 +16,7 @@ function Post({ post }) {
   const [isEditing, setIsEditing] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [newComment, setNewComment] = useState('');
+  const [showComments, setShowComments] = useState(false);
 
   const handleCommentChange = (event) => {
     setComment(event.target.value);
@@ -63,10 +66,14 @@ function Post({ post }) {
     });
   };
 
+  const handleShowComments = () => {
+    setShowComments(!showComments);
+  };
+
   return (
     <div id={post.id} className="post">
       <div className="userPost">
-      <strong>{post.Pseudonim}</strong>
+        <strong>{post.Pseudonim}</strong>
         {currentUser.uid === post.UID && (
           <div className="userActions">
             <IconButton onClick={handleMenuClick} color="primary">
@@ -109,49 +116,58 @@ function Post({ post }) {
             Zapisz
           </button>
         ) : null}
-        <div className="comPostRender">
-          <RenderCom id={post.id} />
-        </div>
+        <ArrowDropDownIcon className="centerIcon" fontSize="small" onClick={handleShowComments} style={{ cursor: 'pointer' }} />
+        {showComments && (
+          <div className="comPostRender">
+            <RenderCom id={post.id} />
+          </div>
+        )}
       </div>
-      <div className="newComment">
-        <form onSubmit={handleCommentSubmit}>
-          <input
-            type="text"
-            value={newComment}
-            onChange={handleNewCommentChange}
-          />
-          <button type="submit">Dodaj komentarz</button>
-        </form>
-      </div>
+      {showComments && (
+        <div className="newComment">
+  <form onSubmit={handleCommentSubmit}>
+    <div className="comment-input-container">
+      <input
+        type="text"
+        value={newComment}
+        onChange={handleNewCommentChange}
+        placeholder="Dodaj komentarz..."
+      />
+      <SendIcon onClick={handleCommentSubmit} style={{ cursor: 'pointer' }} />
+    </div>
+  </form>
+</div>
+)}
+
     </div>
   );
 }
 
 function PostList() {
-  const [postList, setPostList] = useState([]);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    async function fetchPost() {
-      try {
-        const posts = await getPost('wpisy');
-        setPostList(posts);
-      } catch (error) {
-        setError(error);
+    const [postList, setPostList] = useState([]);
+    const [error, setError] = useState(null);
+  
+    useEffect(() => {
+      async function fetchPost() {
+        try {
+          const posts = await getPost('wpisy');
+          setPostList(posts);
+        } catch (error) {
+          setError(error);
+        }
       }
-    }
-
-    fetchPost();
-  }, []);
-
-  return (
-    <div>
-      {postList.map((post, index) => (
-        <Post key={post.id} post={post} />
-      ))}
-      {error && <div>Error: {error.message}</div>}
-    </div>
-  );
-}
+  
+      fetchPost();
+    }, []);
+  
+    return (
+      <div>
+        {postList.map((post, index) => (
+          <Post key={post.id} post={post} />
+        ))}
+        {error && <div>Error: {error.message}</div>}
+      </div>
+    );
+  }
 
 export default PostList;

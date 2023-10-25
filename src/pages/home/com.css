@@ -1,0 +1,10 @@
+.deleteIcon {
+    margin-right: 10px; /* Opcjonalnie - dodaje odstęp między ikonką a tekstem komentarza */
+    float: right;
+  }
+  
+  /* Usuń domyślne stylowanie listy */
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }

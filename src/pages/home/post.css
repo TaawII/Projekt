@@ -7,10 +7,18 @@
 .textPost{
     padding: 5px;
 }
-.comPost{
+.comPost {
     padding: 5px;
-    text-align: right;
-}
+    text-align: center; /* Wyśrodkowanie ikonki poziomo */
+  }
+  
+  .centerIcon {
+    display: flex;
+    justify-content: center; /* Wyśrodkowanie ikonki poziomo */
+    align-items: center; /* Wyśrodkowanie ikonki pionowo */
+  }
+  
+  
 .postUD{
     text-align: right;
 }
@@ -71,4 +79,30 @@
   
   .userActions button {
     margin-left: 10px; /* Opcjonalne - dodaje odstęp między przyciskami */
+  }
+
+  .comment-input-container {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  
+  .comment-input-container input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+  }
+  
+  .comment-input-container input::placeholder {
+    color: #999;
+  }
+
+  .comment-input-container .send-icon {
+    color: #007bff; /* Domyślny kolor linków w Bootstrap, dostosuj według własnych preferencji */
+    font-size: 24px;
+    cursor: pointer;
   }
