@@ -11,8 +11,10 @@
 
 .tweet_pole {
     display: flex;
-    padding: 20px
+    padding: 20px;
+    justify-content: flex-end; /* Wyrównanie do prawej strony */
 }
+
 
 .tweet_pole > input {
     flex: 1;
@@ -28,8 +30,10 @@
     font-weight: 900 !important;
     text-transform: inherit !important;
     border-radius: 30px !important;
-    width: 120px;
+    width: 100px;
     height: 40px !important;
     margin-top: 20px !important;
-    margin-left: auto !important;
-  }
+    margin-left: auto; /* Wyrównanie do prawej strony */
+}
+
+

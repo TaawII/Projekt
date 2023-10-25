@@ -1,57 +1,74 @@
 import { collection } from "firebase/firestore/lite";
-import { GetCom, deletePost} from '../../firebase'; 
-import React, { useEffect, useState, useContext, createContext } from 'react';
+import { GetCom, deletePost } from '../../firebase';
+import React, { useEffect, useState } from 'react';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-function Com(){
-}
-function DeleteButton( ComId ) {
-    console.log(ComId.ComId);
-    const DeletePost = () => {
-        if(deletePost('com', ComId.ComId))
-        {
-            window.location.reload();
-        }
-    };
-    return (
+function Com({ ComId }) {
+  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
+
+  const toggleOptions = () => {
+    setIsOptionsVisible(!isOptionsVisible);
+  };
+
+  const handleEditClick = () => {
+    // Obsługa edycji komentarza
+    console.log("Edytuj komentarz");
+  };
+
+  const handleDeleteClick = () => {
+    // Obsługa usuwania komentarza
+    if (deletePost('com', ComId)) {
+      window.location.reload();
+    }
+  };
+
+  return (
+    <div>
+      <div onClick={toggleOptions}>
+        <ArrowDropDownIcon />
+      </div>
+      {isOptionsVisible && (
         <div>
-            <button onClick={DeletePost}>Usuń komentarz</button>
+          <button onClick={handleEditClick}>Edytuj</button>
+          <button onClick={handleDeleteClick}>Usuń</button>
         </div>
-    )
+      )}
+    </div>
+  );
 }
 
+function RenderCom(id) {
+  const [baseCom, setPostList] = useState([]);
+  const [error, setError] = useState(null);
 
-function RenderCom(id){
-    const [baseCom, setPostList] = useState([]);
-    const [error, setError] = useState(null);
-    useEffect(() => {
-        async function fetchPost() {
-            try {
-                const coms = await GetCom('com',id.id);
-                setPostList(coms);
-            } catch (error) {
-                setError(error);
-            }
-        }
+  useEffect(() => {
+    async function fetchPost() {
+      try {
+        const coms = await GetCom('com', id.id);
+        setPostList(coms);
+      } catch (error) {
+        setError(error);
+      }
+    }
 
-        fetchPost();
-    }, []);
-    return (
-        <div className="getCom">
-            {
-                baseCom.map((post, index) => (
-                    <div id={post.id} key={index}>
-                        <div>
-                            <DeleteButton ComId = {post.id} />
-                            {post.ComText}
-                        </div>
-                    </div>
-                ))
-            }
-            {error && <div>Error: {error.message}</div>}
+    fetchPost();
+  }, []);
+
+  return (
+    <div className="getCom">
+      {baseCom.map((post, index) => (
+        <div id={post.id} key={index}>
+          <div>
+            <Com ComId={post.id} />
+            {post.ComText}
+          </div>
         </div>
-    );
+      ))}
+      {error && <div>Error: {error.message}</div>}
+    </div>
+  );
 }
 
-export {RenderCom}
+export { RenderCom };
 
-export default Com;
+export default RenderCom;

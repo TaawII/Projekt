@@ -1,168 +1,157 @@
-import React, { useEffect, useState, useContext, createContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import './post.css';
-import { getPost, addCom, updatePost, deletePost} from '../../firebase';
-import { doc } from 'firebase/firestore/lite';
+import { getPost, addCom, updatePost, deletePost } from '../../firebase';
 import { AuthContext } from '../../context/AuthContext';
-import { RenderCom}  from './com.js'
+import { RenderCom } from './com.js';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { IconButton, Menu, MenuItem } from '@mui/material';
 
+function Post({ post }) {
+  const { currentUser } = useContext(AuthContext);
+  const [comment, setComment] = useState(post.Tresc);
+  const [isEditing, setIsEditing] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [newComment, setNewComment] = useState('');
 
-function DeleteButton({ postId }) {
-    const DeletePost = () => {
-      if (deletePost('wpisy', postId)) {
-        window.location.reload();
-      }
+  const handleCommentChange = (event) => {
+    setComment(event.target.value);
+  };
+
+  const handleNewCommentChange = (event) => {
+    setNewComment(event.target.value);
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    handleMenuClose();
+  };
+
+  const handleSaveClick = () => {
+    const newData = {
+      Tresc: comment,
     };
-  
-    return (
-      <div>
-        <IconButton onClick={DeletePost} color="primary">
-          <DeleteIcon />
-        </IconButton>
+    updatePost('wpisy', post.id, newData).then(() => {
+      setIsEditing(false);
+    });
+  };
+
+  const handleDeleteClick = () => {
+    deletePost('wpisy', post.id).then(() => {
+      window.location.reload();
+    });
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCommentSubmit = (event) => {
+    event.preventDefault();
+    const ComData = {
+      PostId: post.id,
+      ComText: newComment,
+      Timestamp: new Date(),
+    };
+    addCom('com', ComData).then(() => {
+      setNewComment('');
+    });
+  };
+
+  return (
+    <div id={post.id} className="post">
+      <div className="userPost">
+      <strong>{post.Pseudonim}</strong>
+        {currentUser.uid === post.UID && (
+          <div className="userActions">
+            <IconButton onClick={handleMenuClick} color="primary">
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+            >
+              {isEditing ? (
+                <MenuItem onClick={handleSaveClick}>
+                  <EditIcon />
+                  Zapisz
+                </MenuItem>
+              ) : (
+                <MenuItem onClick={handleEditClick}>
+                  <EditIcon />
+                  Edytuj wpis
+                </MenuItem>
+              )}
+              <MenuItem onClick={handleDeleteClick}>
+                <DeleteIcon />
+                Usuń wpis
+              </MenuItem>
+            </Menu>
+          </div>
+        )}
       </div>
-    );
-  }
-
-function EditForm({ postId, postTresc }) {
-    const [comment, setComment] = useState(postTresc);
-  
-    const HandleCommentChange = (event) => {
-        setComment(event.target.value);
-    };
-
-    const [isVisible, setIsVisible] = useState(false);
-
-    const ToggleVisibility = () => {
-        setComment(postTresc);
-        setIsVisible(!isVisible);
-      };
-
-    const ExitPost = () => {
-        ToggleVisibility();
-    }
-    const SavePost = () => {
-        console.log('Wprowadzony komentarz dla postu', postId, ':', comment);
-        const newData = {
-            Tresc: comment,
-        }
-        if(updatePost('wpisy', postId, newData))
-        {
-            ToggleVisibility();
-            window.location.reload();
-        }
-    };
-
-
-    return (
-        <div>
-            <button onClick={ToggleVisibility}>Edytuj Wpis</button>
-            {isVisible ? (
-                <div className="modal">
-                    <div className="modal-content">
-                        <textarea value={comment} onChange={HandleCommentChange}></textarea>
-                        <div className="modal-button">
-                            <button onClick={SavePost} className="save">Zapisz</button>
-                            <button onClick={ExitPost} className="exit">Anuluj</button>
-                        </div>
-                    </div>
-                </div>
-            ) : null}
+      <div className="textPost">
+        {isEditing ? (
+          <textarea value={comment} onChange={handleCommentChange} />
+        ) : (
+          post.Tresc
+        )}
+      </div>
+      <div className="comPost">
+        {isEditing ? (
+          <button onClick={handleSaveClick} className="save">
+            Zapisz
+          </button>
+        ) : null}
+        <div className="comPostRender">
+          <RenderCom id={post.id} />
         </div>
-    )
+      </div>
+      <div className="newComment">
+        <form onSubmit={handleCommentSubmit}>
+          <input
+            type="text"
+            value={newComment}
+            onChange={handleNewCommentChange}
+          />
+          <button type="submit">Dodaj komentarz</button>
+        </form>
+      </div>
+    </div>
+  );
 }
 
-//P
-function CommentForm({ postId }) {
-    const [comment, setComment] = useState('');
-  
-    const HandleCommentChange = (event) => {
-      setComment(event.target.value);
-    };
-  
-    const SendComment = (event) => {
-      event.preventDefault();
-      var ComData =
-      {
-        PostId: postId,
-        ComText: comment,
-        Timestamp: new Date(),
+function PostList() {
+  const [postList, setPostList] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchPost() {
+      try {
+        const posts = await getPost('wpisy');
+        setPostList(posts);
+      } catch (error) {
+        setError(error);
       }
-      addCom('com', ComData);
-      console.log('Wprowadzony komentarz dla postu', postId, ':', comment);
-    };
-  
-    return (
-      <form onSubmit={SendComment}>
-        <input type="text" value={comment} onChange={HandleCommentChange} />
-        <button type="submit">Koment</button>
-      </form>
-    );
-}
-//B
-
-function UserValidation(postData)
-{
-    const { currentUser } = useContext(AuthContext);
-    const pData = postData.postData;
-    if(pData.UID == currentUser.uid)
-    {
-        return(
-            <div>
-                <EditForm  postId={pData.id} postTresc={pData.Tresc}/>
-                <DeleteButton postId={pData.id}/>
-            </div>
-            )
     }
-    return null;
+
+    fetchPost();
+  }, []);
+
+  return (
+    <div>
+      {postList.map((post, index) => (
+        <Post key={post.id} post={post} />
+      ))}
+      {error && <div>Error: {error.message}</div>}
+    </div>
+  );
 }
 
-//Pobieranie z bazy wszystkich postów
-function Post() {
-    const [postList, setPostList] = useState([]);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        async function fetchPost() {
-            try {
-                const posts = await getPost("wpisy");
-                setPostList(posts);
-            } catch (error) {
-                setError(error);
-            }
-        }
-
-        fetchPost();
-    }, []);
-
-    return (
-        <div className="post">
-            {
-                postList.map((post, index) => (
-                    <div id={post.id} key={index}>
-                        <div className='userPost'>
-                            {post.Pseudonim}
-                            <div className="postUD">
-                                <UserValidation postData={post}/>
-                            </div>
-                        </div>
-                        <div className='textPost'>
-                            {post.Tresc}
-                        </div>
-                        <div className='comPost'>
-                            <CommentForm postId={post.id} />
-                            <div className='comPostRender'>
-                                {
-                                    <RenderCom id={post.id}/>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                ))
-            }
-            {error && <div>Error: {error.message}</div>}
-        </div>
-    );
-}
-
-export default Post;
+export default PostList;
