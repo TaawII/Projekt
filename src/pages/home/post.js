@@ -57,6 +57,8 @@ function Post({ post }) {
     const ComData = {
       PostId: post.id,
       ComText: newComment,
+      UID: currentUser.uid,
+      Pseudonim: currentUser.displayName,
       Timestamp: new Date(),
     };
     addCom('com', ComData)
