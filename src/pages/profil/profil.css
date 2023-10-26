@@ -6,3 +6,8 @@
     margin-right: auto;
     padding: 0 10px;
 }
+
+/* wyłączenie widoku scrollowania */
+.infoProfil::-webkit-scrollbar {
+    display: none
+}
