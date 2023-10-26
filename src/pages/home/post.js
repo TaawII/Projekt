@@ -35,15 +35,13 @@ function Post({ post }) {
     const newData = {
       Tresc: comment,
     };
-    updatePost('wpisy', post.id, newData).then(() => {
+    updatePost('wpisy', post.id, newData)
       setIsEditing(false);
-    });
   };
 
   const handleDeleteClick = () => {
-    deletePost('wpisy', post.id).then(() => {
+    deletePost('wpisy', post.id)
       window.location.reload();
-    });
   };
 
   const handleMenuClick = (event) => {
@@ -61,9 +59,8 @@ function Post({ post }) {
       ComText: newComment,
       Timestamp: new Date(),
     };
-    addCom('com', ComData).then(() => {
+    addCom('com', ComData)
       setNewComment('');
-    });
   };
 
   const handleShowComments = () => {
