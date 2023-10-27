@@ -1,7 +1,7 @@
 // połączenie z bazą danych na Firebase
 import { initializeApp} from "firebase/app";
 import { getAuth, updateProfile } from "firebase/auth";
-import {forEach, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit} from 'firebase/firestore/lite';
 
 const firebaseConfig = {
@@ -17,7 +17,6 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 //74
-
 async function getPost(collectionName) {
   const Colection = collection(db, collectionName);
   const q = query(Colection, orderBy("Timestamp", "desc"), limit(5));
@@ -71,7 +70,7 @@ function addCom(collName, comData) {
   console.log('Nowy dokument do bazy: '+ collName +' został dodany z ID:', newPostRef.id);
 }
 
-export {  getPost, addNewPost, addCom, updatePost, deletePost};
+export { getPost, addNewPost, addCom, updatePost, deletePost};
 //4W
 
 //P
