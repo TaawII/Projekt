@@ -2,6 +2,8 @@
     padding-bottom: 10px;
     border-bottom: 5px solid gray;
     padding-right: 10px;
+    display: flex;
+    justify-content: space-between; /* Wyrównanie do prawej strony */
 }
 
 .tweet > form {
@@ -12,9 +14,8 @@
 .tweet_pole {
     display: flex;
     padding: 20px;
-    justify-content: flex-end; /* Wyrównanie do prawej strony */
+    align-items: flex-end; /* Wyrównanie do dołu */
 }
-
 
 .tweet_pole > input {
     flex: 1;
@@ -33,7 +34,6 @@
     width: 100px;
     height: 40px !important;
     margin-top: 20px !important;
-    margin-left: auto; /* Wyrównanie do prawej strony */
 }
 
 

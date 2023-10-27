@@ -32,10 +32,6 @@ function EdycjaProfilu () {
     return (
         <div className="infoProfil">
 
-          <div className="naglowek">
-            <h2>Strona profilowa</h2>
-          </div>
-
           <div className="tloProfilu">
             {/* miejsce na zmiane tla profilu przez uzytkownika */}
             <img src={BackgroundImage} alt="BackgroundUserProfile" className="tloProfilu"/>

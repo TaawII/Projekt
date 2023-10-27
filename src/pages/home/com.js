@@ -5,14 +5,11 @@ import './com.css';
 import { AuthContext } from '../../context/AuthContext';
 function Com(Com) {
   const { currentUser } = useContext(AuthContext);
+
+export function Com({ ComId, ComText }) {
   const [isOptionsVisible, setIsOptionsVisible] = useState(false);
   const toggleOptions = () => {
     setIsOptionsVisible(!isOptionsVisible);
-  };
-
-  const handleEditClick = () => {
-    // Obsługa edycji komentarza
-    console.log("Edytuj komentarz");
   };
 
   const handleDeleteClick = () => {
@@ -27,6 +24,14 @@ function Com(Com) {
         {currentUser.uid === Com.Com.UID && (
           <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
         )}
+      <div className="comContainer">
+        {isOptionsVisible && (
+          <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
+        )}
+        <div onClick={toggleOptions}>
+          {ComText}
+        </div>
+      </div>
     </div>
   );
 }
