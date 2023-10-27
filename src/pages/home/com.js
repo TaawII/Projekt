@@ -1,11 +1,11 @@
 import { GetCom, deletePost } from '../../firebase';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './com.css';
-
-function Com({ ComId }) {
+import { AuthContext } from '../../context/AuthContext';
+function Com(Com) {
+  const { currentUser } = useContext(AuthContext);
   const [isOptionsVisible, setIsOptionsVisible] = useState(false);
-
   const toggleOptions = () => {
     setIsOptionsVisible(!isOptionsVisible);
   };
@@ -17,22 +17,16 @@ function Com({ ComId }) {
 
   const handleDeleteClick = () => {
     // Obsługa usuwania komentarza
-    if (deletePost('com', ComId)) {
+    if (deletePost('com', Com.Com.id)) {
       window.location.reload();
     }
   };
 
   return (
     <div>
-      <div onClick={toggleOptions}>
-        <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
-        {isOptionsVisible && (
-          <div>
-            <button onClick={handleEditClick}>Edytuj</button>
-            <button onClick={handleDeleteClick}>Usuń</button>
-          </div>
+        {currentUser.uid === Com.Com.UID && (
+          <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
         )}
-      </div>
     </div>
   );
 }
@@ -59,7 +53,7 @@ function RenderCom(id) {
       {baseCom.map((post, index) => (
         <div id={post.id} key={index}>
           <div>
-            <Com ComId={post.id} />
+            <Com Com={post} />
             {post.ComText}
           </div>
         </div>
