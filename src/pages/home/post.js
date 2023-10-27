@@ -1,14 +1,19 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './post.css';
 import { getPost, addCom, updatePost, deletePost } from '../../firebase';
 import { AuthContext } from '../../context/AuthContext';
 import { RenderCom } from './com.js';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { IconButton, Menu, MenuItem } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import SendIcon from '@mui/icons-material/Send';
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import { Avatar } from "@mui/material"
 
 function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -17,6 +22,10 @@ function Post({ post }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(false);
+
+  const handleShowFooter = () => {
+    setShowComments(!showComments);
+  };
 
   const handleCommentChange = (event) => {
     setComment(event.target.value);
@@ -35,13 +44,13 @@ function Post({ post }) {
     const newData = {
       Tresc: comment,
     };
-    updatePost('wpisy', post.id, newData)
-      setIsEditing(false);
+    updatePost('wpisy', post.id, newData);
+    setIsEditing(false);
   };
 
   const handleDeleteClick = () => {
-    deletePost('wpisy', post.id)
-      window.location.reload();
+    deletePost('wpisy', post.id);
+    window.location.reload();
   };
 
   const handleMenuClick = (event) => {
@@ -59,17 +68,16 @@ function Post({ post }) {
       ComText: newComment,
       Timestamp: new Date(),
     };
-    addCom('com', ComData)
-      setNewComment('');
-  };
-
-  const handleShowComments = () => {
-    setShowComments(!showComments);
+    addCom('com', ComData);
+    setNewComment('');
   };
 
   return (
     <div id={post.id} className="post">
       <div className="userPost">
+      
+       <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+
         <strong>{post.Pseudonim}</strong>
         {currentUser.uid === post.UID && (
           <div className="userActions">
@@ -107,35 +115,41 @@ function Post({ post }) {
           post.Tresc
         )}
       </div>
-      <div className="comPost">
+      <div className="post__footer">
+        <ThumbUpIcon fontSize="small" />
+        <ChatBubbleOutlineIcon fontSize="small" onClick={handleShowFooter} style={{ cursor: 'pointer' }} />
+        <RepeatIcon fontSize="small" />
+      </div>
+
+      {showComments && (
+        <div className="newComment">
+          <form onSubmit={handleCommentSubmit}>
+            <div className="comment-input-container">
+              <input
+                type="text"
+                value={newComment}
+                onChange={handleNewCommentChange}
+                placeholder="Dodaj komentarz..."
+              />
+              <SendIcon onClick={handleCommentSubmit} style={{ cursor: 'pointer' }} />
+            </div>
+
+            <div className="comPost">
         {isEditing ? (
           <button onClick={handleSaveClick} className="save">
             Zapisz
           </button>
         ) : null}
-        <ArrowDropDownIcon className="centerIcon" fontSize="small" onClick={handleShowComments} style={{ cursor: 'pointer' }} />
         {showComments && (
           <div className="comPostRender">
             <RenderCom id={post.id} />
           </div>
         )}
       </div>
-      {showComments && (
-        <div className="newComment">
-  <form onSubmit={handleCommentSubmit}>
-    <div className="comment-input-container">
-      <input
-        type="text"
-        value={newComment}
-        onChange={handleNewCommentChange}
-        placeholder="Dodaj komentarz..."
-      />
-      <SendIcon onClick={handleCommentSubmit} style={{ cursor: 'pointer' }} />
-    </div>
-  </form>
-</div>
-)}
 
+          </form>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,7 +5,8 @@
 }
 
 .textPost{
-    padding: 5px;
+    padding-left: 25px;
+    padding-bottom: 20px;
 }
 .comPost {
     padding: 5px;
@@ -67,15 +68,19 @@
 }
 
 .userPost {
-    display: flex;
-    padding-left: 45px;
-    padding-top: 15px;
-    justify-content: space-between;
-  }
+  display: flex;
+  padding: 20px;
+  padding-bottom: 15px;
+  align-items: center; /* Wyrównanie elementów na środek wertykalnie */
+}
+
+.userPost .MuiAvatar-root {
+  margin-right: 10px; /* Lub inna wartość, aby ustawić odstęp między Avatarem a tekstem */
+}
   
-  .userActions {
-    display: flex;
-  }
+.userActions {
+  margin-left: auto; /* Przesunięcie na prawo, pozostawiając inne elementy po lewej stronie */
+}
   
   .userActions button {
     margin-left: 10px; /* Opcjonalne - dodaje odstęp między przyciskami */
@@ -84,10 +89,13 @@
   .comment-input-container {
     display: flex;
     align-items: center;
+    justify-content: center; 
     background-color: #f0f0f0;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 10px;
     padding: 5px;
+    width: 400px;
+    margin: 0 auto; 
   }
   
   .comment-input-container input {
@@ -105,4 +113,29 @@
     color: #007bff; /* Domyślny kolor linków w Bootstrap, dostosuj według własnych preferencji */
     font-size: 24px;
     cursor: pointer;
+  }
+
+  .post__footer {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .post__footer > * {
+    margin: 0 55px; 
+    transition: color 0.3s; /* Dodaj przejście koloru */
+  }
+
+  .post__footer > *:hover {
+    color: rgb(249, 176, 19); /* Zmień kolor na podświetlenie */
+  }
+
+
+  .comPostRender {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    padding-left: 20px;
   }

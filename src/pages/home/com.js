@@ -3,16 +3,11 @@ import React, { useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './com.css';
 
-function Com({ ComId }) {
+export function Com({ ComId, ComText }) {
   const [isOptionsVisible, setIsOptionsVisible] = useState(false);
 
   const toggleOptions = () => {
     setIsOptionsVisible(!isOptionsVisible);
-  };
-
-  const handleEditClick = () => {
-    // Obsługa edycji komentarza
-    console.log("Edytuj komentarz");
   };
 
   const handleDeleteClick = () => {
@@ -24,14 +19,13 @@ function Com({ ComId }) {
 
   return (
     <div>
-      <div onClick={toggleOptions}>
-        <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
+      <div className="comContainer">
         {isOptionsVisible && (
-          <div>
-            <button onClick={handleEditClick}>Edytuj</button>
-            <button onClick={handleDeleteClick}>Usuń</button>
-          </div>
+          <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
         )}
+        <div onClick={toggleOptions}>
+          {ComText}
+        </div>
       </div>
     </div>
   );

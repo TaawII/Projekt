@@ -3,7 +3,6 @@ import { initializeApp} from "firebase/app";
 import { getAuth, updateProfile } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit} from 'firebase/firestore/lite';
-import { Collections } from "@mui/icons-material";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCcGyQDGL55AL5U3gGYsBk8sp5bfwBj970",
