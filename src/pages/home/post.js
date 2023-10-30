@@ -14,7 +14,10 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import { Avatar } from "@mui/material"
-import { addReaction, getReactionsFromDatabase, removeReaction, formatTime } from '../../firebase';
+import { addReaction, getReactionsFromDatabase, removeReaction } from '../../firebase';
+import { formatDistanceToNow } from 'date-fns';
+import { pl } from 'date-fns/locale';
+
 
 function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -128,8 +131,13 @@ function Post({ post }) {
         <div>
           <strong>{post.Pseudonim}</strong>
           <div className="postTime">
-            {post.Timestamp ? formatTime(post.Timestamp.toDate()) : 'Brak daty dodania'}
-          </div>
+          {post.Timestamp
+            ? `${formatDistanceToNow(post.Timestamp.toDate(), {
+                addSuffix: true,
+                locale: pl, 
+              })}`
+            : 'Brak daty dodania'}
+        </div>
         </div>
         {currentUser.uid === post.UID && (
           <div className="userActions">
