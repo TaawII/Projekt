@@ -2,7 +2,7 @@
 import { initializeApp} from "firebase/app";
 import { getAuth, updateProfile } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit} from 'firebase/firestore/lite';
+import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit, getDoc } from 'firebase/firestore/lite';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCcGyQDGL55AL5U3gGYsBk8sp5bfwBj970",
@@ -70,7 +70,7 @@ function addCom(collName, comData) {
   console.log('Nowy dokument do bazy: '+ collName +' został dodany z ID:', newPostRef.id);
 }
 
-export { getPost, addNewPost, addCom, updatePost, deletePost};
+export { getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime };
 //4W
 
 //P
@@ -109,5 +109,85 @@ export async function uploadAvatar(file, currentUser, setLoading) {
   setLoading(false);
   alert("Plik został wysłany");
 } 
+
+// dodawanie reakcji do wpisow
+async function addReaction(collectionName, itemID, userID, reactionType) {
+  const reactionRef = doc(db, collectionName, itemID);
+
+  try {
+    const documentSnapshot = await getDoc(reactionRef);
+
+    if (documentSnapshot.exists()) {
+      const currentReactions = documentSnapshot.data().Reactions || {};
+
+      // Sprawdź, czy użytkownik już dodał reakcję tego typu
+      if (!currentReactions[userID]) {
+        // Dodaj reakcję
+        currentReactions[userID] = reactionType;
+        await updateDoc(reactionRef, { Reactions: currentReactions });
+      }
+    }
+  } catch (error) {
+    console.error('Błąd podczas dodawania reakcji:', error);
+  }
+}
+
+
+async function getReactionsFromDatabase(postId, userId) {
+  const reactionRef = doc(db, 'wpisy', postId); // Zastąp 'nazwaKolekcji' odpowiednią nazwą swojej kolekcji
+
+  try {
+    const documentSnapshot = await getDoc(reactionRef);
+
+    if (documentSnapshot.exists()) {
+      const data = documentSnapshot.data();
+
+      if (data.Reactions) {
+        const likeCount = Object.values(data.Reactions).filter((reaction) => reaction === 'lubie').length;
+        return { like: likeCount };
+      }
+    }
+
+    return { like: 0 }; // Zwróć domyślną reakcję 'like: 0' jeśli pole Reactions jest puste lub brak dokumentu
+  } catch (error) {
+    console.error('Błąd podczas pobierania reakcji:', error);
+    return { like: 0 }; // Obsługa błędu, zwróć domyślną reakcję 'like: 0'
+  }
+}
+
+async function removeReaction(collectionName, itemID, userID, reactionType) {
+  const reactionRef = doc(db, collectionName, itemID);
+
+  try {
+    const documentSnapshot = await getDoc(reactionRef);
+
+    if (documentSnapshot.exists()) {
+      const currentReactions = documentSnapshot.data().Reactions || {};
+
+      // Sprawdź, czy użytkownik udzielił reakcji tego typu i usuń ją
+      if (currentReactions[userID] === reactionType) {
+        delete currentReactions[userID];
+
+        // Zaktualizuj pole Reactions w dokumencie
+        await updateDoc(reactionRef, { Reactions: currentReactions });
+      }
+    }
+  } catch (error) {
+    console.error('Błąd podczas usuwania reakcji:', error);
+  }
+}
+
+function formatTime(date) {
+  if (date instanceof Date) {
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    return `${hours}:${formattedMinutes}`;
+  } else {
+    return 'Błąd formatowania czasu';
+  }
+}
 
 export default app;

@@ -14,6 +14,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import { Avatar } from "@mui/material"
+import { addReaction, getReactionsFromDatabase, removeReaction, formatTime } from '../../firebase';
 
 function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -22,6 +23,8 @@ function Post({ post }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const [reactions, setReactions] = useState({ like: 0 });
+  const currentUserUID = currentUser.uid;
 
   const handleShowFooter = () => {
     setShowComments(!showComments);
@@ -43,6 +46,7 @@ function Post({ post }) {
   const handleSaveClick = () => {
     const newData = {
       Tresc: comment,
+      Reactions: reactions,
     };
     updatePost('wpisy', post.id, newData);
     setIsEditing(false);
@@ -72,13 +76,59 @@ function Post({ post }) {
     setNewComment('');
   };
 
-  return (
-    <div id={post.id} className="post">
-      <div className="userPost">
-      
-       <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+  useEffect(() => {
+    const fetchReactions = async () => {
+      try {
+        // Pobierz reakcje z bazy danych
+        const fetchedReactions = await getReactionsFromDatabase(post.id);
+        setReactions(fetchedReactions);
+      } catch (error) {
+        console.error('Błąd podczas pobierania reakcji:', error);
+      }
+    };
 
-        <strong>{post.Pseudonim}</strong>
+    fetchReactions();
+  }, [post.id]);
+
+  const handleLikeClick = async () => {
+    const reactionType = 'lubie'; // Usuń cudzysłów wokół reakcji "lubie"
+    const userID = currentUser.uid;
+  
+    // Jeśli użytkownik już udzielił reakcji "Lubię to", to usuń ją
+    if (reactions[reactionType]) {
+      try {
+        await removeReaction('wpisy', post.id, userID, reactionType);
+  
+        const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);
+        setReactions(fetchedReactions);
+      } catch (error) {
+        console.error('Błąd podczas usuwania reakcji:', error);
+      }
+    } else {
+      // Jeśli użytkownik jeszcze nie udzielił reakcji "Lubię to", to dodaj ją
+      try {
+        await addReaction('wpisy', post.id, userID, reactionType);
+  
+        const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);
+        setReactions(fetchedReactions);
+      } catch (error) {
+        console.error('Błąd podczas dodawania reakcji:', error);
+      }
+    }
+  };
+
+  return (
+<div id={post.id} className="post">
+  <div className="userPost">
+    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+
+    <div>
+      <strong>{post.Pseudonim}</strong>
+      <div className="postTime">
+        {post.Timestamp ? formatTime(post.Timestamp.toDate()) : 'Brak daty dodania'}
+      </div>
+    </div>
+
         {currentUser.uid === post.UID && (
           <div className="userActions">
             <IconButton onClick={handleMenuClick} color="primary">
@@ -116,9 +166,16 @@ function Post({ post }) {
         )}
       </div>
       <div className="post__footer">
-        <ThumbUpIcon fontSize="small" />
-        <ChatBubbleOutlineIcon fontSize="small" onClick={handleShowFooter} style={{ cursor: 'pointer' }} />
-        <RepeatIcon fontSize="small" />
+    <div className="like-container" onClick={handleLikeClick}>
+      <ThumbUpIcon fontSize="small" style={{ cursor: 'pointer' }} />
+      <span>{reactions.like}</span>
+    </div>
+    <div className="reaction" onClick={handleShowFooter}>
+      <ChatBubbleOutlineIcon fontSize="small" style={{ cursor: 'pointer' }} />
+    </div>
+    <div className="reaction">
+      <RepeatIcon fontSize="small" />
+    </div>
       </div>
 
       {showComments && (
@@ -135,18 +192,17 @@ function Post({ post }) {
             </div>
 
             <div className="comPost">
-        {isEditing ? (
-          <button onClick={handleSaveClick} className="save">
-            Zapisz
-          </button>
-        ) : null}
-        {showComments && (
-          <div className="comPostRender">
-            <RenderCom id={post.id} />
-          </div>
-        )}
-      </div>
-
+              {isEditing ? (
+                <button onClick={handleSaveClick} className="save">
+                  Zapisz
+                </button>
+              ) : null}
+              {showComments && (
+                <div className="comPostRender">
+                  <RenderCom id={post.id} />
+                </div>
+              )}
+            </div>
           </form>
         </div>
       )}
@@ -155,30 +211,30 @@ function Post({ post }) {
 }
 
 function PostList() {
-    const [postList, setPostList] = useState([]);
-    const [error, setError] = useState(null);
-  
-    useEffect(() => {
-      async function fetchPost() {
-        try {
-          const posts = await getPost('wpisy');
-          setPostList(posts);
-        } catch (error) {
-          setError(error);
-        }
+  const [postList, setPostList] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchPost() {
+      try {
+        const posts = await getPost('wpisy');
+        setPostList(posts);
+      } catch (error) {
+        setError(error);
       }
-  
-      fetchPost();
-    }, []);
-  
-    return (
-      <div>
-        {postList.map((post, index) => (
-          <Post key={post.id} post={post} />
-        ))}
-        {error && <div>Error: {error.message}</div>}
-      </div>
-    );
-  }
+    }
+
+    fetchPost();
+  }, []);
+
+  return (
+    <div>
+      {postList.map((post, index) => (
+        <Post key={post.id} post={post} />
+      ))}
+      {error && <div>Error: {error.message}</div>}
+    </div>
+  );
+}
 
 export default PostList;

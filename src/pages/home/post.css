@@ -9,14 +9,14 @@
     padding-bottom: 20px;
 }
 .comPost {
-    padding: 5px;
-    text-align: center; /* Wyśrodkowanie ikonki poziomo */
+    padding: 20px;
+    text-align: center; 
   }
   
   .centerIcon {
     display: flex;
-    justify-content: center; /* Wyśrodkowanie ikonki poziomo */
-    align-items: center; /* Wyśrodkowanie ikonki pionowo */
+    justify-content: center; 
+    align-items: center; 
   }
   
   
@@ -71,11 +71,16 @@
   display: flex;
   padding: 20px;
   padding-bottom: 15px;
-  align-items: center; /* Wyrównanie elementów na środek wertykalnie */
+  align-items: center; 
+  margin-right: 10px; 
 }
 
+.postTime {
+  margin-left: 10px;
+  display: inline-block;
+}
 .userPost .MuiAvatar-root {
-  margin-right: 10px; /* Lub inna wartość, aby ustawić odstęp między Avatarem a tekstem */
+  margin-right: 10px; 
 }
   
 .userActions {
@@ -110,27 +115,37 @@
   }
 
   .comment-input-container .send-icon {
-    color: #007bff; /* Domyślny kolor linków w Bootstrap, dostosuj według własnych preferencji */
+    color: #007bff; 
     font-size: 24px;
     cursor: pointer;
   }
 
   .post__footer {
-    padding: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 10px;
   }
   
-  .post__footer > * {
-    margin: 0 55px; 
-    transition: color 0.3s; /* Dodaj przejście koloru */
+  .like-container,
+  .reaction {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .reaction {
+    margin-left: 120px; 
+  }
+  
+  .postTime {
+    margin-left: 10px; 
+    display: inline-block;
   }
 
   .post__footer > *:hover {
-    color: rgb(249, 176, 19); /* Zmień kolor na podświetlenie */
+    color: rgb(249, 176, 19); 
   }
-
 
   .comPostRender {
     display: flex;
@@ -139,3 +154,4 @@
     padding-bottom: 10px;
     padding-left: 20px;
   }
+
