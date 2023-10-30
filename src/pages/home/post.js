@@ -79,7 +79,6 @@ function Post({ post }) {
   useEffect(() => {
     const fetchReactions = async () => {
       try {
-        // Pobierz reakcje z bazy danych
         const fetchedReactions = await getReactionsFromDatabase(post.id);
         setReactions(fetchedReactions);
       } catch (error) {
@@ -91,10 +90,9 @@ function Post({ post }) {
   }, [post.id]);
 
   const handleLikeClick = async () => {
-    const reactionType = 'lubie'; // Usuń cudzysłów wokół reakcji "lubie"
+    const reactionType = 'lubie'; 
     const userID = currentUser.uid;
   
-    // Jeśli użytkownik już udzielił reakcji "Lubię to", to usuń ją
     if (reactions[reactionType]) {
       try {
         await removeReaction('wpisy', post.id, userID, reactionType);
@@ -105,7 +103,6 @@ function Post({ post }) {
         console.error('Błąd podczas usuwania reakcji:', error);
       }
     } else {
-      // Jeśli użytkownik jeszcze nie udzielił reakcji "Lubię to", to dodaj ją
       try {
         await addReaction('wpisy', post.id, userID, reactionType);
   

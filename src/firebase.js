@@ -120,9 +120,7 @@ async function addReaction(collectionName, itemID, userID, reactionType) {
     if (documentSnapshot.exists()) {
       const currentReactions = documentSnapshot.data().Reactions || {};
 
-      // Sprawdź, czy użytkownik już dodał reakcję tego typu
       if (!currentReactions[userID]) {
-        // Dodaj reakcję
         currentReactions[userID] = reactionType;
         await updateDoc(reactionRef, { Reactions: currentReactions });
       }
@@ -132,9 +130,8 @@ async function addReaction(collectionName, itemID, userID, reactionType) {
   }
 }
 
-
 async function getReactionsFromDatabase(postId, userId) {
-  const reactionRef = doc(db, 'wpisy', postId); // Zastąp 'nazwaKolekcji' odpowiednią nazwą swojej kolekcji
+  const reactionRef = doc(db, 'wpisy', postId); 
 
   try {
     const documentSnapshot = await getDoc(reactionRef);
@@ -148,13 +145,14 @@ async function getReactionsFromDatabase(postId, userId) {
       }
     }
 
-    return { like: 0 }; // Zwróć domyślną reakcję 'like: 0' jeśli pole Reactions jest puste lub brak dokumentu
+    return { like: 0 }; 
   } catch (error) {
     console.error('Błąd podczas pobierania reakcji:', error);
-    return { like: 0 }; // Obsługa błędu, zwróć domyślną reakcję 'like: 0'
+    return { like: 0 }; 
   }
 }
 
+// to nie dziala jeszcze
 async function removeReaction(collectionName, itemID, userID, reactionType) {
   const reactionRef = doc(db, collectionName, itemID);
 
@@ -164,11 +162,9 @@ async function removeReaction(collectionName, itemID, userID, reactionType) {
     if (documentSnapshot.exists()) {
       const currentReactions = documentSnapshot.data().Reactions || {};
 
-      // Sprawdź, czy użytkownik udzielił reakcji tego typu i usuń ją
       if (currentReactions[userID] === reactionType) {
         delete currentReactions[userID];
 
-        // Zaktualizuj pole Reactions w dokumencie
         await updateDoc(reactionRef, { Reactions: currentReactions });
       }
     }
