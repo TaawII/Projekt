@@ -1,12 +1,16 @@
-.post{
-    width: 100%;
-    min-height: 100px;
-    border-bottom: 1px solid gray;
+.post {
+  border-bottom: 1px solid gray;
+  overflow: auto; /* Dodaje paski przewijania, jeśli zawartość jest zbyt duża */
+  max-width: 750px;
 }
 
-.textPost{
-    padding-left: 25px;
-    padding-bottom: 20px;
+.textPost {
+  padding-left: 25px;
+  padding-bottom: 20px;
+  overflow-y: auto;
+  word-wrap: break-word;
+  max-height: 750px; /* Dodaj tę linię */
+  padding-right: 25px;
 }
 .comPost {
     padding: 20px;
@@ -84,11 +88,11 @@
 }
   
 .userActions {
-  margin-left: auto; /* Przesunięcie na prawo, pozostawiając inne elementy po lewej stronie */
+  margin-left: auto; 
 }
   
   .userActions button {
-    margin-left: 10px; /* Opcjonalne - dodaje odstęp między przyciskami */
+    margin-left: 10px; 
   }
 
   .comment-input-container {
@@ -108,6 +112,7 @@
     border: none;
     background: none;
     outline: none;
+    max-height: 200px; 
   }
   
   .comment-input-container input::placeholder {
@@ -122,8 +127,8 @@
 
   .post__footer {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center; 
     padding: 10px;
   }
   
@@ -131,11 +136,11 @@
   .reaction {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 5px; 
   }
   
   .reaction {
-    margin-left: 120px; 
+    margin-left: 100px; 
   }
   
   .postTime {
@@ -155,3 +160,17 @@
     padding-left: 20px;
   }
 
+  .editTextarea {
+    width: 95%;
+    min-height: 100px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  .editTextarea::placeholder {
+    color: #aaa; 
+  }
+  

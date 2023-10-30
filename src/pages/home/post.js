@@ -43,13 +43,18 @@ function Post({ post }) {
     handleMenuClose();
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     const newData = {
       Tresc: comment,
       Reactions: reactions,
     };
     updatePost('wpisy', post.id, newData);
     setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setComment(post.Tresc);
   };
 
   const handleDeleteClick = () => {
@@ -67,13 +72,17 @@ function Post({ post }) {
 
   const handleCommentSubmit = (event) => {
     event.preventDefault();
-    const ComData = {
-      PostId: post.id,
-      ComText: newComment,
-      Timestamp: new Date(),
-    };
-    addCom('com', ComData);
-    setNewComment('');
+    if (newComment.trim() !== '') { 
+      const userID = currentUser.uid; 
+      const ComData = {
+        PostId: post.id,
+        ComText: newComment,
+        Timestamp: new Date(),
+        UserID: userID, 
+      };
+      addCom('com', ComData);
+      setNewComment('');
+    }
   };
 
   useEffect(() => {
@@ -90,22 +99,20 @@ function Post({ post }) {
   }, [post.id]);
 
   const handleLikeClick = async () => {
-    const reactionType = 'lubie'; 
+    const reactionType = 'lubie';
     const userID = currentUser.uid;
-  
+
     if (reactions[reactionType]) {
       try {
         await removeReaction('wpisy', post.id, userID, reactionType);
-  
         const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);
         setReactions(fetchedReactions);
       } catch (error) {
         console.error('Błąd podczas usuwania reakcji:', error);
       }
     } else {
-      try {
+      try { 
         await addReaction('wpisy', post.id, userID, reactionType);
-  
         const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);
         setReactions(fetchedReactions);
       } catch (error) {
@@ -115,17 +122,15 @@ function Post({ post }) {
   };
 
   return (
-<div id={post.id} className="post">
-  <div className="userPost">
-    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-
-    <div>
-      <strong>{post.Pseudonim}</strong>
-      <div className="postTime">
-        {post.Timestamp ? formatTime(post.Timestamp.toDate()) : 'Brak daty dodania'}
-      </div>
-    </div>
-
+    <div id={post.id} className="post">
+      <div className="userPost">
+        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+        <div>
+          <strong>{post.Pseudonim}</strong>
+          <div className="postTime">
+            {post.Timestamp ? formatTime(post.Timestamp.toDate()) : 'Brak daty dodania'}
+          </div>
+        </div>
         {currentUser.uid === post.UID && (
           <div className="userActions">
             <IconButton onClick={handleMenuClick} color="primary">
@@ -137,10 +142,16 @@ function Post({ post }) {
               onClose={handleMenuClose}
             >
               {isEditing ? (
-                <MenuItem onClick={handleSaveClick}>
-                  <EditIcon />
-                  Zapisz
-                </MenuItem>
+                <div>
+                  <MenuItem onClick={handleSaveClick}>
+                    <EditIcon />
+                    Zapisz
+                  </MenuItem>
+                  <MenuItem onClick={handleCancelEdit}>
+                    <EditIcon />
+                    Anuluj
+                  </MenuItem>
+                </div>
               ) : (
                 <MenuItem onClick={handleEditClick}>
                   <EditIcon />
@@ -157,24 +168,23 @@ function Post({ post }) {
       </div>
       <div className="textPost">
         {isEditing ? (
-          <textarea value={comment} onChange={handleCommentChange} />
+          <textarea value={comment} onChange={handleCommentChange} className="editTextarea" />
         ) : (
           post.Tresc
         )}
       </div>
       <div className="post__footer">
-    <div className="like-container" onClick={handleLikeClick}>
-      <ThumbUpIcon fontSize="small" style={{ cursor: 'pointer' }} />
-      <span>{reactions.like}</span>
-    </div>
-    <div className="reaction" onClick={handleShowFooter}>
-      <ChatBubbleOutlineIcon fontSize="small" style={{ cursor: 'pointer' }} />
-    </div>
-    <div className="reaction">
-      <RepeatIcon fontSize="small" />
-    </div>
+        <div className="like-container" onClick={handleLikeClick}>
+          <ThumbUpIcon fontSize="small" style={{ cursor: 'pointer' }} />
+          <span>{reactions.like}</span>
+        </div>
+        <div className="reaction" onClick={handleShowFooter}>
+          <ChatBubbleOutlineIcon fontSize="small" style={{ cursor: 'pointer' }} />
+        </div>
+        <div className="reaction">
+          <RepeatIcon fontSize="small" />
+        </div>
       </div>
-
       {showComments && (
         <div className="newComment">
           <form onSubmit={handleCommentSubmit}>
@@ -187,13 +197,7 @@ function Post({ post }) {
               />
               <SendIcon onClick={handleCommentSubmit} style={{ cursor: 'pointer' }} />
             </div>
-
             <div className="comPost">
-              {isEditing ? (
-                <button onClick={handleSaveClick} className="save">
-                  Zapisz
-                </button>
-              ) : null}
               {showComments && (
                 <div className="comPostRender">
                   <RenderCom id={post.id} />
@@ -226,9 +230,9 @@ function PostList() {
 
   return (
     <div>
-      {postList.map((post, index) => (
-        <Post key={post.id} post={post} />
-      ))}
+{postList.map((post, index) => (
+  <Post key={post.id} post={post} addCom={addCom} />
+))}
       {error && <div>Error: {error.message}</div>}
     </div>
   );

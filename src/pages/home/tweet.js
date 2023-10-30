@@ -42,8 +42,8 @@ class OpublikujForm extends React.Component {
                 <div className="tweet_pole">
                     <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
                     <input id='SendText' placeholder="Co słychać?" type="text" value={this.state.PostTresc} onChange={this.handleChange}/>
-                </div>
                 <Button type="submit" id="SendPost" className="tweet_przycisk">Opublikuj</Button>
+                </div>
             </form>
         </div>
       );

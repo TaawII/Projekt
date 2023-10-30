@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
-//74
+
 async function getPost(collectionName) {
   const Colection = collection(db, collectionName);
   const q = query(Colection, orderBy("Timestamp", "desc"), limit(5));
@@ -34,6 +34,11 @@ async function getPost(collectionName) {
 
 function addNewPost(collectionName, postData) {
   const postsCol = collection(db, collectionName);
+
+  if (!postData.Tresc || postData.Tresc.trim() === '') {
+    return false;
+  }
+
   try {
     const newPostRef = addDoc(postsCol, postData);
     return true;
@@ -42,11 +47,10 @@ function addNewPost(collectionName, postData) {
   }
 }
 
-function updatePost(collectionName, documentId, newData)
-{
+function updatePost(collectionName, documentId, newContent) {
   const documentRef = doc(db, collectionName, documentId);
   try {
-    updateDoc(documentRef, newData);
+    updateDoc(documentRef, newContent);
     return true;
   } catch (error) {
     return false;
@@ -64,20 +68,20 @@ function deletePost(collectionName, documentId)
   }
 }
 
-function addCom(collName, comData) {
+async function addCom(collName, comData) {
   const postsCol = collection(db, collName);
-  const newPostRef = addDoc(postsCol, comData);
-  console.log('Nowy dokument do bazy: '+ collName +' został dodany z ID:', newPostRef.id);
+  try {
+    const newPostRef = await addDoc(postsCol, comData);
+    console.log('Nowy dokument do bazy: ' + collName + ' został dodany z ID:', newPostRef.id);
+  } catch (error) {
+    console.error('Błąd podczas dodawania dokumentu:', error);
+  }
 }
 
-export { getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime };
-//4W
-
-//P
-//Dodać sortowanie od najnowszego
+// dodać sortowanie od najnowszego
 async function GetCom(collectionName, idWpisu) {
   const Colection = collection(db, collectionName);
-  const q = query(Colection, where("PostId", "==", idWpisu),limit(2));
+  const q = query(Colection, where("PostId", "==", idWpisu),limit(5));
   const Snapshot = await getDocs(q);
   
   const List = Snapshot.docs.map((doc) => {
@@ -89,11 +93,6 @@ async function GetCom(collectionName, idWpisu) {
   console.log(List);
   return List;
 }
-export {GetCom}
-//B
-
-export const auth = getAuth(app);
-export const storage = getStorage();
 
 //Dodawanie avatara do profilu
 export async function uploadAvatar(file, currentUser, setLoading) {
@@ -185,5 +184,10 @@ function formatTime(date) {
     return 'Błąd formatowania czasu';
   }
 }
+
+export const auth = getAuth(app);
+export const storage = getStorage();
+
+export { getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom };
 
 export default app;

@@ -1,60 +1,85 @@
 import { GetCom, deletePost } from '../../firebase';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './com.css';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { AuthContext } from '../../context/AuthContext';
 
-export function Com({ ComId, ComText }) {
-  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
 
-  const toggleOptions = () => {
-    setIsOptionsVisible(!isOptionsVisible);
+export function Com({ ComId, ComText, onDeleteClick }) {
+
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const toggleOptions = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const handleDeleteClick = () => {
-    // Obsługa usuwania komentarza
-    if (deletePost('com', ComId)) {
-      window.location.reload();
-    }
+    onDeleteClick(ComId);
+    setAnchorEl(null); 
   };
 
   return (
     <div>
       <div className="comContainer">
-        {isOptionsVisible && (
-          <DeleteIcon className="deleteIcon" onClick={handleDeleteClick} />
-        )}
         <div onClick={toggleOptions}>
           {ComText}
         </div>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+        >
+          <MenuItem onClick={handleDeleteClick}>
+            <DeleteIcon />
+            Usuń komentarz
+          </MenuItem>
+        </Menu>
       </div>
     </div>
   );
 }
 
+
 function RenderCom(id) {
-  const [baseCom, setPostList] = useState([]);
+  const { currentUser } = useContext(AuthContext); 
+  const [baseCom, setBaseCom] = useState([]);
   const [error, setError] = useState(null);
+
+  const handleDeleteCom = async (comId) => {
+    // Pobierz komentarz, aby sprawdzić, czy użytkownik jest autorem
+    const commentToDelete = baseCom.find((com) => com.id === comId);
+    
+    if (commentToDelete && commentToDelete.UserID === currentUser.uid) {
+      if (await deletePost('com', comId)) {
+        // Odśwież listę komentarzy
+        setBaseCom((prevComs) => prevComs.filter((com) => com.id !== comId));
+      }
+    }
+  };
 
   useEffect(() => {
     async function fetchPost() {
       try {
-        const coms = await GetCom('com', id.id);
-        setPostList(coms);
+        if (id && id.id) {
+          const coms = await GetCom('com', id.id);
+          setBaseCom(coms);
+        }
       } catch (error) {
         setError(error);
       }
     }
 
     fetchPost();
-  }, []);
+  }, [id.id]);
 
   return (
     <div className="getCom">
       {baseCom.map((post, index) => (
         <div id={post.id} key={index}>
           <div>
-            <Com ComId={post.id} />
-            {post.ComText}
+            <Com ComId={post.id} ComText={post.ComText} onDeleteClick={handleDeleteCom} />
           </div>
         </div>
       ))}
