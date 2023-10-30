@@ -16,7 +16,34 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
+
 //74
+
+async function getUserUid(userName) {
+  const Colection = collection(db, 'user');
+  const q = query(Colection,where("UserName", "==", userName), limit(1));
+  const Snapshot = await getDocs(q);
+  
+  const List = Snapshot.docs.map((doc) => {
+    const docID = doc.id;
+    const docData = doc.data();
+    return { id: docID, ...docData };
+  });
+
+  console.log(List);
+  return List;
+}
+
+function addNewUser(postData) {
+  const postsCol = collection(db, 'user');
+  try {
+    addDoc(postsCol, postData);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 async function getPost(collectionName) {
   const Colection = collection(db, collectionName);
   const q = query(Colection, orderBy("Timestamp", "desc"), limit(5));
@@ -70,7 +97,7 @@ function addCom(collName, comData) {
   console.log('Nowy dokument do bazy: '+ collName +' został dodany z ID:', newPostRef.id);
 }
 
-export { getPost, addNewPost, addCom, updatePost, deletePost};
+export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost};
 //4W
 
 //P

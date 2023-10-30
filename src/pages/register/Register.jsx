@@ -5,6 +5,7 @@ import "./register.scss";
 import { auth } from "../../firebase";
 import { updateProfile, createUserWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../../context/AuthContext";
+import { addNewUser } from '../../firebase';
 
 const Register = () => {
   const { dispatch } = useContext(AuthContext);
@@ -84,6 +85,11 @@ const Register = () => {
         inputValues.email,
         inputValues.password
       ).then((userCredential) => {
+        const RegData = {
+          UserName: inputValues.username,
+          UserUID: userCredential.user.uid,
+        };
+        addNewUser(RegData);
         // Signed in
         const user = userCredential.user;
         updateProfile(user, {
