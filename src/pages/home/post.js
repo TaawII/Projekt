@@ -17,7 +17,7 @@ import { Avatar } from "@mui/material"
 import { addReaction, getReactionsFromDatabase, removeReaction } from '../../firebase';
 import { formatDistanceToNow } from 'date-fns';
 import { pl } from 'date-fns/locale';
-
+import { getStorage, ref, getDownloadURL } from "firebase/storage"; 
 
 function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -27,6 +27,8 @@ function Post({ post }) {
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(false);
   const [reactions, setReactions] = useState({ like: 0 });
+  const [userPhotoURL, setUserPhotoURL] = useState(''); // Dodaj stan dla zdjęcia profilowego
+
   const currentUserUID = currentUser.uid;
 
   const handleShowFooter = () => {
@@ -49,7 +51,6 @@ function Post({ post }) {
   const handleSaveClick = async () => {
     const newData = {
       Tresc: comment,
-      Reactions: reactions,
     };
     updatePost('wpisy', post.id, newData);
     setIsEditing(false);
@@ -100,7 +101,18 @@ function Post({ post }) {
     };
 
     fetchReactions();
-  }, [post.id]);
+
+    const storage = getStorage();
+    const avatarRef = ref(storage, `${post.UID}.png`);
+
+    getDownloadURL(avatarRef)
+      .then((url) => {
+        setUserPhotoURL(url);
+      })
+      .catch((error) => {
+        console.error('Błąd podczas pobierania avatara z Firebase Storage:', error);
+      });
+  }, [post.id, post.UID]);
 
   const handleLikeClick = async () => {
     const reactionType = 'lubie';
@@ -128,17 +140,17 @@ function Post({ post }) {
   return (
     <div id={post.id} className="post">
       <div className="userPost">
-        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+        <Avatar alt={post.Pseudonim} src={userPhotoURL} />
         <div>
           <strong>{post.Pseudonim}</strong>
           <div className="postTime">
-          {post.Timestamp
-            ? `${formatDistanceToNow(post.Timestamp.toDate(), {
-                addSuffix: true,
-                locale: pl, 
-              })}`
-            : 'Brak daty dodania'}
-        </div>
+            {post.Timestamp
+              ? `${formatDistanceToNow(post.Timestamp.toDate(), {
+                  addSuffix: true,
+                  locale: pl,
+                })}`
+              : 'Brak daty dodania'}
+          </div>
         </div>
         {currentUser.uid === post.UID && (
           <div className="userActions">

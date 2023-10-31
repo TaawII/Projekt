@@ -1,50 +1,59 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { uploadAvatar } from '../../firebase';
 import './edycja-profilu.css';
 import { AuthContext } from '../../context/AuthContext';
-import { uploadAvatar } from "../../firebase"; 
+import BackgroundImage from './img/bg_user_default.jpg';
 import Image from './img/avatar_default.jpg';
-import BackgroundImage from './img/bg_user_default.jpg'
 
-function EdycjaProfilu () {
-    const { currentUser } = useContext(AuthContext);
-    const [ photo, setPhoto ] = useState(null);
-    const [ loading, setLoading ] = useState(false);
-    const [ photoURL, setPhotoURL ] = useState(Image);
+function EdycjaProfilu() {
+  const { currentUser } = useContext(AuthContext);
+  const [photo, setPhoto] = useState(null);
+  const [userPhotoURL, setUserPhotoURL] = useState(currentUser.photoURL || Image);
 
-    function handleChange(e) {
-      if (e.target.files[0]) {
-        setPhoto(e.target.files[0])
-      }
-    }
+  const storage = getStorage();
+  const avatarRef = ref(storage, currentUser.uid + '.png');
 
-    function handleClick() {
-      uploadAvatar(photo, currentUser, setLoading); 
-    }
-
-    useEffect(() => {
-      if (currentUser && currentUser.photoURL) {
-        currentUser.reload().then(() => { 
-          setPhotoURL(currentUser.photoURL);
+  useEffect(() => {
+    getDownloadURL(avatarRef)
+      .then((url) => {
+        setUserPhotoURL(url);
+      })
+      .catch((error) => {
+        console.error('Błąd podczas pobierania avatara z Firebase Storage:', error);
       });
+  }, [currentUser]);
+
+  const handleAvatarChange = async () => {
+    try {
+      if (photo) {
+        const photoURL = await uploadAvatar(photo, currentUser);
+        setUserPhotoURL(photoURL);
+      }
+    } catch (error) {
+      console.error('Błąd podczas przesyłania avatara:', error);
     }
-    }, [currentUser])
+  }
 
-    return (
-        <div className="infoProfil">
+  const handleFileChange = (e) => {
+    if (e.target.files[0]) {
+      setPhoto(e.target.files[0]);
+    }
+  };
 
-          <div className="tloProfilu">
-            {/* miejsce na zmiane tla profilu przez uzytkownika */}
-            <img src={BackgroundImage} alt="BackgroundUserProfile" className="tloProfilu"/>
-          </div>
-
-          <div className="info">
-            <img src={photoURL} alt="Avatar" className="avatar" />
-            <span className="displayName">{currentUser.displayName}</span><br></br>
-            <input type="file" onChange={handleChange}></input>
-            <button disabled={loading || !photo} onClick={handleClick}>Wyślij</button>
-          </div>
-        </div>
-      );
+  return (
+    <div className="infoProfil">
+      <div className="tloProfilu">
+        <img src={BackgroundImage} alt="BackgroundUserProfile" className="tloProfilu" />
+      </div>
+      <div className="info">
+        <img src={userPhotoURL} alt="Avatar" className="avatar" />
+        <span className="displayName">{currentUser.displayName}</span><br></br>
+        <input type="file" onChange={handleFileChange}></input>
+        <button disabled={!photo} onClick={handleAvatarChange}>Wyślij</button>
+      </div>
+    </div>
+  );
 }
 
 export default EdycjaProfilu;

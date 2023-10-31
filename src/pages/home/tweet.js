@@ -1,62 +1,66 @@
-import React, {useContext, createContext} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import './tweet.css';
 import { Avatar, Button } from "@mui/material"
 import { addNewPost } from '../../firebase';
 import { AuthContext } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
-class OpublikujForm extends React.Component {
-    static contextType = AuthContext;
-    constructor(props) {
-      super(props);
-      this.state = {PostTresc: ''};
-  
-      this.handleChange = this.handleChange.bind(this);
-      this.handleSubmit = this.handleSubmit.bind(this);
-    }
+function OpublikujForm() {
+  const { currentUser } = useContext(AuthContext);
+  const [PostTresc, setPostTresc] = useState('');
+  const [userPhotoURL, setUserPhotoURL] = useState(''); // Używamy pustego URL, początkowo
 
-    handleChange(event) {
-      this.setState({PostTresc: event.target.value});
+  const handleChange = (event) => {
+    setPostTresc(event.target.value);
+  };
+
+  useEffect(() => {
+    const storage = getStorage();
+    const avatarRef = ref(storage, currentUser.uid + '.png');
+
+    getDownloadURL(avatarRef)
+      .then((url) => {
+        setUserPhotoURL(url); // Aktualizacja URL zdjęcia profilowego
+      })
+      .catch((error) => {
+        console.error('Błąd podczas pobierania avatara z Firebase Storage:', error);
+      });
+  }, [currentUser]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const newPostData = {
+      UID: currentUser.uid,
+      Pseudonim: currentUser.displayName,
+      Tresc: PostTresc,
+      Timestamp: new Date(),
+    };
+
+    if (addNewPost('wpisy', newPostData)) {
+      setPostTresc('');
     }
-  
-    handleSubmit(event) {
-        const { currentUser } = this.context;
-        var newPostData = {
-            UID: currentUser.uid,
-            Pseudonim: currentUser.displayName,
-            Tresc: this.state.PostTresc,
-            Timestamp: new Date(),
-          };
-        if(addNewPost('wpisy', newPostData))
-        {
-            window.location.reload(); 
-        }
-      this.setState({ PostTresc: ''});
-      event.preventDefault();
-    }
-  
-    render() {
-      return (
-        <div>
-            <form onSubmit={this.handleSubmit} autoComplete="off">
-                <div className="tweet_pole">
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                    <input id='SendText' placeholder="Co słychać?" type="text" value={this.state.PostTresc} onChange={this.handleChange}/>
-                <Button type="submit" id="SendPost" className="tweet_przycisk">Opublikuj</Button>
-                </div>
-            </form>
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit} autoComplete="off">
+        <div className="tweet_pole">
+          <Avatar alt={currentUser.displayName} src={userPhotoURL} /> {/* Wyświetlanie zdjęcia profilowego użytkownika */}
+          <input id='SendText' placeholder="Co słychać?" type="text" value={PostTresc} onChange={handleChange} />
+          <Button type="submit" id="SendPost" className="tweet_przycisk">Opublikuj</Button>
         </div>
-      );
-    }
-  }
-
-function Tweet(){
-    return(
-        <div className="tweet">
-            <OpublikujForm />
-        </div>
-    );
+      </form>
+    </div>
+  );
 }
 
+function Tweet() {
+  return (
+    <div className="tweet">
+      <OpublikujForm />
+    </div>
+  );
+}
 
 export default Tweet;
