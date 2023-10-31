@@ -126,19 +126,30 @@ async function GetCom(collectionName, idWpisu) {
 }
 
 //Dodawanie avatara do profilu
-export async function uploadAvatar(file, currentUser, setLoading) {
+async function uploadAvatar(file, currentUser) {
   const fileRef = ref(storage, currentUser.uid + '.png');
 
-  setLoading(true);
+  try {
+    await uploadBytes(fileRef, file);
+    const photoURL = await getDownloadURL(fileRef);
+    return photoURL; // Zwracaj photoURL
+  } catch (error) {
+    console.error('Błąd podczas przesyłania avatara:', error);
+    throw error; // Rzuć błąd w przypadku problemu
+  }
+}
 
-  const snapshot = await uploadBytes(fileRef, file);
-  const photoURL = await getDownloadURL(fileRef);
+export const getAvatarFromStorage = async (user) => {
+  try {
+    const avatarPath = `${user.uid}.png`;
+    const avatarRef = storage.ref(avatarPath);
+    const avatarURL = await avatarRef.getDownloadURL();
 
-  updateProfile(currentUser, {photoURL});
-
-  setLoading(false);
-  alert("Plik został wysłany");
-} 
+    return avatarURL;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // dodawanie reakcji do wpisow
 async function addReaction(collectionName, itemID, userID, reactionType) {
@@ -219,6 +230,6 @@ function formatTime(date) {
 export const auth = getAuth(app);
 export const storage = getStorage();
 
-export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom };
+export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar };
 
 export default app;
