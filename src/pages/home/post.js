@@ -82,6 +82,7 @@ function Post({ post }) {
         ComText: newComment,
         Timestamp: new Date(),
         UserID: userID, 
+        Pseudonim: currentUser.displayName,
       };
       addCom('com', ComData);
       setNewComment('');

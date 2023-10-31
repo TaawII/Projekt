@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { AuthContext } from '../../context/AuthContext';
 
 
-export function Com({ ComId, ComText, onDeleteClick }) {
+export function Com({ ComId, ComText, Pseudonim, onDeleteClick }) {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -21,22 +21,20 @@ export function Com({ ComId, ComText, onDeleteClick }) {
   };
 
   return (
-    <div>
-      <div className="comContainer">
-        <div onClick={toggleOptions}>
-          {ComText}
-        </div>
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={() => setAnchorEl(null)}
-        >
-          <MenuItem onClick={handleDeleteClick}>
-            <DeleteIcon />
-            Usuń komentarz
-          </MenuItem>
-        </Menu>
+    <div className="comContainer">
+      <div onClick={toggleOptions}>
+        <strong>{`${Pseudonim}:`}</strong> {ComText}
       </div>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
+        <MenuItem onClick={handleDeleteClick}>
+          <DeleteIcon />
+          Usuń komentarz
+        </MenuItem>
+      </Menu>
     </div>
   );
 }
@@ -77,11 +75,7 @@ function RenderCom(id) {
   return (
     <div className="getCom">
       {baseCom.map((post, index) => (
-        <div id={post.id} key={index}>
-          <div>
-            <Com ComId={post.id} ComText={post.ComText} onDeleteClick={handleDeleteCom} />
-          </div>
-        </div>
+        <Com key={post.id} ComId={post.id} ComText={post.ComText} Pseudonim={post.Pseudonim} onDeleteClick={handleDeleteCom} />
       ))}
       {error && <div>Error: {error.message}</div>}
     </div>
