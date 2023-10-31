@@ -6,6 +6,7 @@ import { signOut } from 'firebase/auth';
 import Zakladka from './panel-boczny-zakladki';
 import { auth } from '../../firebase';
 import { AuthContext } from '../../context/AuthContext';
+import SearchUser from './searchUser.js';
 
 function Prawo() {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ function Prawo() {
         <>
           <p>Jesteś zalogowany jako: {currentUser.displayName}</p>
           <Zakladka Ikonka={LogoutIcon} tekst="Wyloguj" onClick={handleLogout} />
+        
+          <SearchUser />
         </>
     </div>
   );

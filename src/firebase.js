@@ -17,6 +17,31 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
+async function getUserUid(userName) {
+  const Colection = collection(db, 'user');
+  const q = query(Colection,where("UserName", "==", userName), limit(1));
+  const Snapshot = await getDocs(q);
+  
+  const List = Snapshot.docs.map((doc) => {
+    const docID = doc.id;
+    const docData = doc.data();
+    return { id: docID, ...docData };
+  });
+
+  console.log(List);
+  return List;
+}
+
+function addNewUser(postData) {
+  const postsCol = collection(db, 'user');
+  try {
+    addDoc(postsCol, postData);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 async function getPost(collectionName) {
   const Colection = collection(db, collectionName);
   const q = query(Colection, orderBy("Timestamp", "desc"), limit(5));
@@ -78,7 +103,13 @@ async function addCom(collName, comData) {
   }
 }
 
+//4W
+
+//P
+//Dodać sortowanie od najnowszego
+
 // dodać sortowanie od najnowszego
+
 async function GetCom(collectionName, idWpisu) {
   const Colection = collection(db, collectionName);
   const q = query(Colection, where("PostId", "==", idWpisu),limit(5));
@@ -188,6 +219,6 @@ function formatTime(date) {
 export const auth = getAuth(app);
 export const storage = getStorage();
 
-export { getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom };
+export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom };
 
 export default app;
