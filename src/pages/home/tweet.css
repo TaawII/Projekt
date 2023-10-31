@@ -1,9 +1,7 @@
 .tweet {
     padding-bottom: 10px;
     border-bottom: 5px solid gray;
-    padding-right: 10px;
-    display: flex;
-    justify-content: space-between; /* Wyrównanie do prawej strony */
+    padding-right: 15px;
 }
 
 .tweet > form {
@@ -13,16 +11,20 @@
 
 .tweet_pole {
     display: flex;
+    align-items: center;
     padding: 20px;
-    align-items: flex-end; /* Wyrównanie do dołu */
 }
 
 .tweet_pole > input {
     flex: 1;
-    margin-left: 20px;
+    width: 100%; 
+    margin-right: 10px;
     border: none;
+    margin-left: 10px;
     font-size: 20px;
+    height: 60px;
 }
+
 
 .tweet_przycisk {
     background-color: rgb(249, 176, 19) !important;
@@ -33,7 +35,12 @@
     border-radius: 30px !important;
     width: 100px;
     height: 40px !important;
-    margin-top: 20px !important;
+    margin-top: 0; /* Zmień to na 0, aby nie było górnego marginesu */
+    margin-left: 20px; /* Dodaj odstęp między przyciskiem a polem tekstowym */
 }
 
-
+.tweet_controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

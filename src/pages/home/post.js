@@ -14,6 +14,10 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import { Avatar } from "@mui/material"
+import { addReaction, getReactionsFromDatabase, removeReaction } from '../../firebase';
+import { formatDistanceToNow } from 'date-fns';
+import { pl } from 'date-fns/locale';
+
 
 function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -22,6 +26,8 @@ function Post({ post }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const [reactions, setReactions] = useState({ like: 0 });
+  const currentUserUID = currentUser.uid;
 
   const handleShowFooter = () => {
     setShowComments(!showComments);
@@ -40,12 +46,18 @@ function Post({ post }) {
     handleMenuClose();
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     const newData = {
       Tresc: comment,
+      Reactions: reactions,
     };
     updatePost('wpisy', post.id, newData);
     setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setComment(post.Tresc);
   };
 
   const handleDeleteClick = () => {
@@ -63,22 +75,70 @@ function Post({ post }) {
 
   const handleCommentSubmit = (event) => {
     event.preventDefault();
-    const ComData = {
-      PostId: post.id,
-      ComText: newComment,
-      Timestamp: new Date(),
+    if (newComment.trim() !== '') { 
+      const userID = currentUser.uid; 
+      const ComData = {
+        PostId: post.id,
+        ComText: newComment,
+        Timestamp: new Date(),
+        UserID: userID, 
+      };
+      addCom('com', ComData);
+      setNewComment('');
+    }
+  };
+
+  useEffect(() => {
+    const fetchReactions = async () => {
+      try {
+        const fetchedReactions = await getReactionsFromDatabase(post.id);
+        setReactions(fetchedReactions);
+      } catch (error) {
+        console.error('Błąd podczas pobierania reakcji:', error);
+      }
     };
-    addCom('com', ComData);
-    setNewComment('');
+
+    fetchReactions();
+  }, [post.id]);
+
+  const handleLikeClick = async () => {
+    const reactionType = 'lubie';
+    const userID = currentUser.uid;
+
+    if (reactions[reactionType]) {
+      try {
+        await removeReaction('wpisy', post.id, userID, reactionType);
+        const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);
+        setReactions(fetchedReactions);
+      } catch (error) {
+        console.error('Błąd podczas usuwania reakcji:', error);
+      }
+    } else {
+      try { 
+        await addReaction('wpisy', post.id, userID, reactionType);
+        const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);
+        setReactions(fetchedReactions);
+      } catch (error) {
+        console.error('Błąd podczas dodawania reakcji:', error);
+      }
+    }
   };
 
   return (
     <div id={post.id} className="post">
       <div className="userPost">
-      
-       <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-
-        <strong>{post.Pseudonim}</strong>
+        <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+        <div>
+          <strong>{post.Pseudonim}</strong>
+          <div className="postTime">
+          {post.Timestamp
+            ? `${formatDistanceToNow(post.Timestamp.toDate(), {
+                addSuffix: true,
+                locale: pl, 
+              })}`
+            : 'Brak daty dodania'}
+        </div>
+        </div>
         {currentUser.uid === post.UID && (
           <div className="userActions">
             <IconButton onClick={handleMenuClick} color="primary">
@@ -90,10 +150,16 @@ function Post({ post }) {
               onClose={handleMenuClose}
             >
               {isEditing ? (
-                <MenuItem onClick={handleSaveClick}>
-                  <EditIcon />
-                  Zapisz
-                </MenuItem>
+                <div>
+                  <MenuItem onClick={handleSaveClick}>
+                    <EditIcon />
+                    Zapisz
+                  </MenuItem>
+                  <MenuItem onClick={handleCancelEdit}>
+                    <EditIcon />
+                    Anuluj
+                  </MenuItem>
+                </div>
               ) : (
                 <MenuItem onClick={handleEditClick}>
                   <EditIcon />
@@ -110,17 +176,23 @@ function Post({ post }) {
       </div>
       <div className="textPost">
         {isEditing ? (
-          <textarea value={comment} onChange={handleCommentChange} />
+          <textarea value={comment} onChange={handleCommentChange} className="editTextarea" />
         ) : (
           post.Tresc
         )}
       </div>
       <div className="post__footer">
-        <ThumbUpIcon fontSize="small" />
-        <ChatBubbleOutlineIcon fontSize="small" onClick={handleShowFooter} style={{ cursor: 'pointer' }} />
-        <RepeatIcon fontSize="small" />
+        <div className="like-container" onClick={handleLikeClick}>
+          <ThumbUpIcon fontSize="small" style={{ cursor: 'pointer' }} />
+          <span>{reactions.like}</span>
+        </div>
+        <div className="reaction" onClick={handleShowFooter}>
+          <ChatBubbleOutlineIcon fontSize="small" style={{ cursor: 'pointer' }} />
+        </div>
+        <div className="reaction">
+          <RepeatIcon fontSize="small" />
+        </div>
       </div>
-
       {showComments && (
         <div className="newComment">
           <form onSubmit={handleCommentSubmit}>
@@ -133,20 +205,13 @@ function Post({ post }) {
               />
               <SendIcon onClick={handleCommentSubmit} style={{ cursor: 'pointer' }} />
             </div>
-
             <div className="comPost">
-        {isEditing ? (
-          <button onClick={handleSaveClick} className="save">
-            Zapisz
-          </button>
-        ) : null}
-        {showComments && (
-          <div className="comPostRender">
-            <RenderCom id={post.id} />
-          </div>
-        )}
-      </div>
-
+              {showComments && (
+                <div className="comPostRender">
+                  <RenderCom id={post.id} />
+                </div>
+              )}
+            </div>
           </form>
         </div>
       )}
@@ -155,30 +220,30 @@ function Post({ post }) {
 }
 
 function PostList() {
-    const [postList, setPostList] = useState([]);
-    const [error, setError] = useState(null);
-  
-    useEffect(() => {
-      async function fetchPost() {
-        try {
-          const posts = await getPost('wpisy');
-          setPostList(posts);
-        } catch (error) {
-          setError(error);
-        }
+  const [postList, setPostList] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchPost() {
+      try {
+        const posts = await getPost('wpisy');
+        setPostList(posts);
+      } catch (error) {
+        setError(error);
       }
-  
-      fetchPost();
-    }, []);
-  
-    return (
-      <div>
-        {postList.map((post, index) => (
-          <Post key={post.id} post={post} />
-        ))}
-        {error && <div>Error: {error.message}</div>}
-      </div>
-    );
-  }
+    }
+
+    fetchPost();
+  }, []);
+
+  return (
+    <div>
+{postList.map((post, index) => (
+  <Post key={post.id} post={post} addCom={addCom} />
+))}
+      {error && <div>Error: {error.message}</div>}
+    </div>
+  );
+}
 
 export default PostList;

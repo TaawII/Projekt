@@ -1,22 +1,26 @@
-.post{
-    width: 100%;
-    min-height: 100px;
-    border-bottom: 1px solid gray;
+.post {
+  border-bottom: 1px solid gray;
+  overflow: auto; /* Dodaje paski przewijania, jeśli zawartość jest zbyt duża */
+  max-width: 750px;
 }
 
-.textPost{
-    padding-left: 25px;
-    padding-bottom: 20px;
+.textPost {
+  padding-left: 25px;
+  padding-bottom: 20px;
+  overflow-y: auto;
+  word-wrap: break-word;
+  max-height: 750px; /* Dodaj tę linię */
+  padding-right: 25px;
 }
 .comPost {
-    padding: 5px;
-    text-align: center; /* Wyśrodkowanie ikonki poziomo */
+    padding: 20px;
+    text-align: center; 
   }
   
   .centerIcon {
     display: flex;
-    justify-content: center; /* Wyśrodkowanie ikonki poziomo */
-    align-items: center; /* Wyśrodkowanie ikonki pionowo */
+    justify-content: center; 
+    align-items: center; 
   }
   
   
@@ -71,19 +75,24 @@
   display: flex;
   padding: 20px;
   padding-bottom: 15px;
-  align-items: center; /* Wyrównanie elementów na środek wertykalnie */
+  align-items: center; 
+  margin-right: 10px; 
 }
 
+.postTime {
+  margin-left: 10px;
+  display: inline-block;
+}
 .userPost .MuiAvatar-root {
-  margin-right: 10px; /* Lub inna wartość, aby ustawić odstęp między Avatarem a tekstem */
+  margin-right: 10px; 
 }
   
 .userActions {
-  margin-left: auto; /* Przesunięcie na prawo, pozostawiając inne elementy po lewej stronie */
+  margin-left: auto; 
 }
   
   .userActions button {
-    margin-left: 10px; /* Opcjonalne - dodaje odstęp między przyciskami */
+    margin-left: 10px; 
   }
 
   .comment-input-container {
@@ -103,6 +112,7 @@
     border: none;
     background: none;
     outline: none;
+    max-height: 200px; 
   }
   
   .comment-input-container input::placeholder {
@@ -110,27 +120,37 @@
   }
 
   .comment-input-container .send-icon {
-    color: #007bff; /* Domyślny kolor linków w Bootstrap, dostosuj według własnych preferencji */
+    color: #007bff; 
     font-size: 24px;
     cursor: pointer;
   }
 
   .post__footer {
-    padding: 10px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center; 
+    padding: 10px;
   }
   
-  .post__footer > * {
-    margin: 0 55px; 
-    transition: color 0.3s; /* Dodaj przejście koloru */
+  .like-container,
+  .reaction {
+    display: flex;
+    align-items: center;
+    gap: 5px; 
+  }
+  
+  .reaction {
+    margin-left: 100px; 
+  }
+  
+  .postTime {
+    margin-left: 10px; 
+    display: inline-block;
   }
 
   .post__footer > *:hover {
-    color: rgb(249, 176, 19); /* Zmień kolor na podświetlenie */
+    color: rgb(249, 176, 19); 
   }
-
 
   .comPostRender {
     display: flex;
@@ -139,3 +159,18 @@
     padding-bottom: 10px;
     padding-left: 20px;
   }
+
+  .editTextarea {
+    width: 95%;
+    min-height: 100px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  .editTextarea::placeholder {
+    color: #aaa; 
+  }
+  
