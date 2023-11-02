@@ -47,7 +47,6 @@ async function getUserName(userUID) {
   return List;
 }
 
-
 function addNewUser(postData) {
   const postsCol = collection(db, 'user');
   try {
@@ -269,6 +268,8 @@ export const updateProfileDescription = async (uid, description) => {
 export const auth = getAuth(app);
 export const storage = getStorage();
 
-export {getUserName, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground };
+
+export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
+
 
 export default app;

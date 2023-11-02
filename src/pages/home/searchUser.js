@@ -1,7 +1,8 @@
 // połączenie z bazą danych na Firebase
 import React, { useState } from 'react';
 import { getUserUid } from '../../firebase';
-import { useNavigate } from 'react-router-dom';
+import { Link, RouterProvider, useNavigate } from 'react-router-dom';
+import './prawo.css'
 import SearchIcon from '@mui/icons-material/Search';
 
 function SearchUser()
