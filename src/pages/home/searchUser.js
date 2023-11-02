@@ -18,7 +18,7 @@ function SearchUser()
         console.log(UserData[0].UserUID);
         if(UserData[0].UserUID)
         {
-          navigate(`/profil/${UserData[0].UserUID}`);
+          navigate(`/userprofile/${UserData[0].UserUID}`);
         };
     };
 
