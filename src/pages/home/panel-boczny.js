@@ -4,16 +4,27 @@ import Zakladka from './panel-boczny-zakladki';
 import HomeIcon from '@mui/icons-material/Home';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PersonIcon from '@mui/icons-material/Person';
-import { Button } from '@mui/material';
 import { Link, RouterProvider, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { useContext } from 'react';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { auth } from '../../firebase';
+import { signOut } from 'firebase/auth'; 
+
 
 function Panel() {
-
-  const { currentUser } = useContext(AuthContext);
-
   const navigate = useNavigate();
+  const { currentUser, dispatch } = useContext(AuthContext);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      dispatch({ type: "LOGOUT" }); 
+      navigate('/login');
+      console.log("Wylogowano pomyślnie");
+    } catch (error) {
+      console.error('Błąd podczas wylogowywania:', error);
+    }
+  };
 
   const messagePage = () => {
     navigate('/wiadomosci');
@@ -25,7 +36,6 @@ function Panel() {
 
     return (
       <div className="panel">
-        { /* tu jakieś logo można wstawić */ }
         
         { /* zakladka w panelu 1 */ }
         <Link to="/"> {/* Ścieżka do głównej strony */}
@@ -43,7 +53,7 @@ function Panel() {
         {/* </Link> */}
   
         { /* Przycisk - dodaj wpis */ }
-        <Button variant="outlined" className="przyciskWpis" fullWidth>Testowy przycisk</Button>
+        <Zakladka Ikonka={LogoutIcon} tekst="Wyloguj" onClick={handleLogout} />
       </div>
     );
 }
