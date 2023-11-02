@@ -6,14 +6,24 @@ import { AuthContext } from '../../context/AuthContext';
 import Image from './img/avatar_default.jpg';
 import DefaultBackgroundImage from './img/bg_user_default.jpg';
 
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  orderBy,
+} from 'firebase/firestore/lite';
+
 function EdycjaProfilu() {
   const { currentUser } = useContext(AuthContext);
   const [photo, setPhoto] = useState(null);
   const [userPhotoURL, setUserPhotoURL] = useState(currentUser.photoURL || Image);
   const [backgroundImage, setBackgroundImage] = useState(DefaultBackgroundImage);
-  const [description, setDescription] = useState(''); // Dodaj stan opisu użytkownika
+  const [description, setDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
+  const [userPosts, setUserPosts] = useState([]);
 
   const fileInputRef = useRef(null);
   const avatarRef = useRef(null);
@@ -114,6 +124,33 @@ function EdycjaProfilu() {
       });
   };
 
+  // załadowanie postów użytkownika
+  const fetchUserPosts = async (uid) => {
+    const db = getFirestore();
+    const postsCollection = collection(db, 'wpisy');
+    const q = query(postsCollection, where('UID', '==', uid), orderBy('Timestamp', 'desc'));
+    console.log("userPosts", userPosts);
+
+    
+    try {
+      const querySnapshot = await getDocs(q);
+      const posts = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setUserPosts(posts);
+    } catch (error) {
+      console.error('Błąd podczas pobierania postów:', error);
+    }
+  };
+  
+  useEffect(() => {
+    if (currentUser.uid) {
+      fetchUserPosts(currentUser.uid);
+    }
+  }, [currentUser.uid]);
+
+
   return (
     <div className="infoProfil">
       <div className="tloProfilu">
@@ -146,7 +183,7 @@ function EdycjaProfilu() {
             <button onClick={handleSaveDescription}>Zapisz</button>
           </div>
         ) : isUserDataLoaded ? (
-          <div>
+          <div className='description'>
             <span className="userDescription" onClick={handleDescriptionChange}>
               {description || 'Dodaj opis...'}
             </span>
@@ -162,6 +199,14 @@ function EdycjaProfilu() {
           ref={fileInputRef}
         />
       </div>
+      <div className="userPosts">
+      <h2>Twoje ostatnie dodane wpisy: </h2>
+      <ul>
+        {userPosts.map((post) => (
+          <li key={post.id}>{post.Tresc}</li>
+        ))}
+      </ul>
+    </div>
     </div>
   );
 }

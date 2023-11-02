@@ -13,7 +13,7 @@
 
 .tloProfilu {
     height: 281.25px;
-    width: 750px;
+    width: 800px;
     cursor: pointer;
 }
 
@@ -44,5 +44,15 @@
 .displayName {
     font-weight: bold;
     font-size: 30px;
+}
+
+.description{
+    padding-bottom: 15px;
+    padding-left: 30px;
+}
+
+.userPosts{
+    max-width: 800px;
+    padding: 15px;
 }
 
