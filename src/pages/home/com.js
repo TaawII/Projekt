@@ -8,8 +8,10 @@ import { AuthContext } from '../../context/AuthContext';
 
 export function Com({ ComId, ComText, Pseudonim, onDeleteClick, isAuthor }) {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   const toggleOptions = (event) => {
+    event.stopPropagation(); 
     setAnchorEl(event.currentTarget);
   };
 
@@ -18,13 +20,28 @@ export function Com({ ComId, ComText, Pseudonim, onDeleteClick, isAuthor }) {
     setAnchorEl(null);
   };
 
+  const handleMouseEnter = () => {
+    if (isAuthor) {
+      setIsHovered(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
   return (
-    <div className="comContainer">
-      <div onClick={toggleOptions}>
+    <div
+      className={`comContainer ${isHovered ? 'highlighted' : ''}`}
+      onClick={toggleOptions}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div>
         <strong>{`${Pseudonim}:`}</strong> {ComText}
       </div>
       {isAuthor && (
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)} onClick={(e) => e.stopPropagation()}>
           <MenuItem onClick={handleDeleteClick}>
             <DeleteIcon />
             Usuń komentarz
@@ -56,12 +73,10 @@ function RenderCom(id) {
   }, [id.id]);
 
   const handleDeleteCom = async (comId) => {
-    // Pobierz komentarz, aby sprawdzić, czy użytkownik jest autorem
     const commentToDelete = baseCom.find((com) => com.id === comId);
 
     if (commentToDelete && commentToDelete.UserID === currentUser.uid) {
       if (await deletePost('com', comId)) {
-        // Odśwież listę komentarzy
         setBaseCom((prevComs) => prevComs.filter((com) => com.id !== comId));
       }
     }
@@ -76,7 +91,7 @@ function RenderCom(id) {
           ComText={post.ComText}
           Pseudonim={post.Pseudonim}
           onDeleteClick={handleDeleteCom}
-          isAuthor={post.UserID === currentUser.uid} // Sprawdź, czy użytkownik jest autorem komentarza
+          isAuthor={post.UserID === currentUser.uid} 
         />
       ))}
       {error && <div>Error: {error.message}</div>}
