@@ -23,9 +23,7 @@ function PrawoProfil() {
 
   return (
     <div className="prawo">
-        <>
           <Zakladka Ikonka={LogoutIcon} tekst="Wyloguj" onClick={handleLogout} />
-        </>
     </div>
   );
 }

@@ -5,3 +5,55 @@
     padding-top: 15px;
     min-width: 250px;
 }
+
+.searchUser{
+    padding-top: 30px;
+    padding-left: 10px;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .search-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .search-input {
+    flex: 1; 
+    padding: 8px;
+    border: 2px solid #ccc;
+    border-radius: 4px 0 0 4px; 
+    outline: none;
+    font-size: 16px;
+    height: 36px; 
+  }
+  
+  .search-input::placeholder {
+    color: #999;
+  }
+  
+  .search-button {
+    background-color: rgb(249, 176, 19);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0; 
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 36px; 
+  }
+  
+  .search-button:hover {
+    background-color: rgb(254, 175, 5);
+  }
+  
+  .MuiSvgIcon-root {
+    font-size: 24px; 
+    margin-right: 8px; 
+  }
