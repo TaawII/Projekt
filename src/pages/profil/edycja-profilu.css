@@ -56,3 +56,22 @@
     padding: 15px;
 }
 
+.editTextarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+  }
+  
+  .editTextarea::placeholder {
+    color: #aaa;
+  }
+
+  .editText{
+    padding-left: 25px;
+    padding-right: 25px;
+    padding-bottom: 25px;
+  }

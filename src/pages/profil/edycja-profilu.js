@@ -21,6 +21,7 @@ function EdycjaProfilu() {
   const [userPhotoURL, setUserPhotoURL] = useState(currentUser.photoURL || Image);
   const [backgroundImage, setBackgroundImage] = useState(DefaultBackgroundImage);
   const [description, setDescription] = useState('');
+  const [tempDescription, setTempDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
   const [userPosts, setUserPosts] = useState([]);
@@ -54,6 +55,7 @@ function EdycjaProfilu() {
     getProfileDescription(currentUser.uid)
       .then((userDescription) => {
         setDescription(userDescription);
+        setTempDescription(userDescription); // Kopiowanie do tempDescription
         setIsUserDataLoaded(true);
       });
   }, [currentUser]);
@@ -111,6 +113,7 @@ function EdycjaProfilu() {
   };
 
   const handleDescriptionChange = () => {
+    setTempDescription(description);
     setIsEditingDescription(true);
   };
 
@@ -124,14 +127,17 @@ function EdycjaProfilu() {
       });
   };
 
+  const handleCancelDescription = () => {
+    setDescription(tempDescription);
+    setIsEditingDescription(false);
+  };
+
   // załadowanie postów użytkownika
   const fetchUserPosts = async (uid) => {
     const db = getFirestore();
     const postsCollection = collection(db, 'wpisy');
     const q = query(postsCollection, where('UID', '==', uid), orderBy('Timestamp', 'desc'));
-    console.log("userPosts", userPosts);
 
-    
     try {
       const querySnapshot = await getDocs(q);
       const posts = querySnapshot.docs.map((doc) => ({
@@ -143,13 +149,12 @@ function EdycjaProfilu() {
       console.error('Błąd podczas pobierania postów:', error);
     }
   };
-  
+
   useEffect(() => {
     if (currentUser.uid) {
       fetchUserPosts(currentUser.uid);
     }
   }, [currentUser.uid]);
-
 
   return (
     <div className="infoProfil">
@@ -175,22 +180,25 @@ function EdycjaProfilu() {
         <span className="displayName">{currentUser.displayName}</span>
         <br></br>
         {isEditingDescription ? (
-          <div>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <button onClick={handleSaveDescription}>Zapisz</button>
-          </div>
-        ) : isUserDataLoaded ? (
-          <div className='description'>
-            <span className="userDescription" onClick={handleDescriptionChange}>
-              {description || 'Dodaj opis...'}
-            </span>
-          </div>
-        ) : (
-          <div>Ładowanie opisu profilu...</div>
-        )}
+  <div className='editText'>
+    <textarea
+      className="editTextarea"  
+      value={description}
+      onChange={(e) => setDescription(e.target.value)}
+      placeholder="Dodaj opis..."
+    />
+    <button onClick={handleSaveDescription}>Zapisz</button>
+    <button onClick={handleCancelDescription}>Anuluj</button>
+  </div>
+) : isUserDataLoaded ? (
+  <div className='description'>
+    <span className="userDescription" onClick={handleDescriptionChange}>
+      {description || 'Dodaj opis...'}
+    </span>
+  </div>
+) : (
+  <div className='description'>Ładowanie opisu profilu...</div>
+)}
         <input
           type="file"
           accept="image/*"
@@ -200,13 +208,13 @@ function EdycjaProfilu() {
         />
       </div>
       <div className="userPosts">
-      <h2>Twoje ostatnie dodane wpisy: </h2>
-      <ul>
-        {userPosts.map((post) => (
-          <li key={post.id}>{post.Tresc}</li>
-        ))}
-      </ul>
-    </div>
+        <h2>Twoje ostatnie dodane wpisy: </h2>
+        <ul>
+          {userPosts.map((post) => (
+            <li key={post.id}>{post.Tresc}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
