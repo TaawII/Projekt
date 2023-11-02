@@ -268,6 +268,8 @@ export const updateProfileDescription = async (uid, description) => {
 export const auth = getAuth(app);
 export const storage = getStorage();
 
+
 export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
+
 
 export default app;
