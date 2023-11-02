@@ -32,6 +32,21 @@ async function getUserUid(userName) {
   return List;
 }
 
+async function getUserName(userUID) {
+  const Colection = collection(db, 'user');
+  const q = query(Colection,where("UserUID", "==", userUID), limit(1));
+  const Snapshot = await getDocs(q);
+  
+  const List = Snapshot.docs.map((doc) => {
+    const docID = doc.id;
+    const docData = doc.data();
+    return { id: docID, ...docData };
+  });
+
+  console.log(List);
+  return List;
+}
+
 function addNewUser(postData) {
   const postsCol = collection(db, 'user');
   try {
@@ -253,6 +268,6 @@ export const updateProfileDescription = async (uid, description) => {
 export const auth = getAuth(app);
 export const storage = getStorage();
 
-export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground };
+export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
 
 export default app;

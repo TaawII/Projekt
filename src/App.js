@@ -11,7 +11,7 @@ import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
 import Profil from "./pages/profil/Profil";
 import Wiadomosci from "./pages/wiadomosci/Wiadomosci";
-
+import UserProfil from "./pages/profil/UserProfile";
 function App() {
   const { currentUser } = useContext(AuthContext);
 
@@ -27,6 +27,10 @@ function App() {
     {
       path: "/register",
       element: <Register />,
+    },
+    {
+      path: `/userprofile/:userUID`,
+      element: <UserProfil />,
     },
     {
       path: `/profil/${currentUser?.uid}`,

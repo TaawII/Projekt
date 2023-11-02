@@ -1,8 +1,9 @@
 import React from "react";
 import "./profil.css";
 import Panel from "../home/panel-boczny";
-import EdycjaProfilu from "./edycja-profilu";
+import PokazProfil from "./pokaz-profil";
 import PrawoProfil from "./prawo-profil";
+import { useParams } from "react-router-dom";
 
 const Profil = () => {
   return (
@@ -13,7 +14,7 @@ const Profil = () => {
         <Panel/>
         }
         {
-        <EdycjaProfilu />
+        <PokazProfil />
         }
         {
         <PrawoProfil />
