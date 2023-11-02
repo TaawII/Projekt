@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 import './prawo-profil.css'
-import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import Zakladka from '../home/panel-boczny-zakladki';
+import SearchUser from '../home/searchUser.js';
 import { auth } from '../../firebase';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -23,7 +22,7 @@ function PrawoProfil() {
 
   return (
     <div className="prawo">
-          <Zakladka Ikonka={LogoutIcon} tekst="Wyloguj" onClick={handleLogout} />
+            <SearchUser />
     </div>
   );
 }
