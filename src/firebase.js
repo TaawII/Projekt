@@ -2,7 +2,7 @@
 import { initializeApp} from "firebase/app";
 import { getAuth, updateProfile } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit, getDoc } from 'firebase/firestore/lite';
+import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit, getDoc, setDoc } from 'firebase/firestore/lite';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCcGyQDGL55AL5U3gGYsBk8sp5bfwBj970",
@@ -66,6 +66,7 @@ function addNewPost(collectionName, postData) {
 
   try {
     const newPostRef = addDoc(postsCol, postData);
+    window.location.reload();
     return true;
   } catch (error) {
     return false;
@@ -102,13 +103,6 @@ async function addCom(collName, comData) {
     console.error('Błąd podczas dodawania dokumentu:', error);
   }
 }
-
-//4W
-
-//P
-//Dodać sortowanie od najnowszego
-
-// dodać sortowanie od najnowszego
 
 async function GetCom(collectionName, idWpisu) {
   const Colection = collection(db, collectionName);
@@ -227,9 +221,38 @@ function formatTime(date) {
   }
 }
 
+async function uploadBackground(file, currentUser) {
+  const fileRef = ref(storage, currentUser.uid + '_background.jpg');
+
+  try {
+    await uploadBytes(fileRef, file);
+    const backgroundURL = await getDownloadURL(fileRef);
+    return backgroundURL; // Zwracaj backgroundURL
+  } catch (error) {
+    console.error('Błąd podczas przesyłania tła:', error);
+    throw error; // Rzuć błąd w przypadku problemu
+  }
+}
+
+export const getProfileDescription = async (uid) => {
+  const userDocRef = doc(db, 'description', uid);
+  const userDocSnap = await getDoc(userDocRef);
+
+  if (userDocSnap.exists()) {
+    return userDocSnap.data().description;
+  } else {
+    return '';
+  }
+};
+
+export const updateProfileDescription = async (uid, description) => {
+  const userDocRef = doc(db, 'description', uid);
+  await setDoc(userDocRef, { description });
+};
+
 export const auth = getAuth(app);
 export const storage = getStorage();
 
-export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar };
+export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground };
 
 export default app;
