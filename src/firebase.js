@@ -31,7 +31,31 @@ async function getUserUid(userName) {
   console.log(List);
   return List;
 }
+async function addFollow(userUID, userID) {
+  try {
+    const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
+    const querySnapshot = await getDocs(q);
 
+    if (!querySnapshot.empty) {
+      const documentSnapshot = querySnapshot.docs[0];
+
+      if (documentSnapshot.exists()) {
+        const currentFollow = documentSnapshot.data().Follow || {};
+
+        if (!currentFollow[userID]) {
+          currentFollow[userID] = 'Follow';
+
+          const reactionRef = doc(db, 'user', documentSnapshot.id);
+          await updateDoc(reactionRef, { Follow: currentFollow });
+        }
+      }
+    } else {
+      console.log('Nie znaleziono dokumentu o podanym UserUID.');
+    }
+  } catch (error) {
+    console.error('Błąd podczas dodawania reakcji:', error);
+  }
+}
 async function getUserName(userUID) {
   const Colection = collection(db, 'user');
   const q = query(Colection,where("UserUID", "==", userUID), limit(1));
@@ -269,7 +293,7 @@ export const auth = getAuth(app);
 export const storage = getStorage();
 
 
-export {getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
+export {addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
 
 
 export default app;

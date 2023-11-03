@@ -5,7 +5,7 @@ import DefaultBackgroundImage from './img/bg_user_default.jpg';
 import Image from './img/avatar_default.jpg';
 import { useParams } from "react-router-dom";
 import { getProfileDescription } from '../../firebase';
-import { getUserName } from '../../firebase';
+import { getUserName, addFollow } from '../../firebase';
 import UserPostsFetcher from './posts.js';
 
 function PokazProfil() {
@@ -23,6 +23,10 @@ function PokazProfil() {
     storage,
     userUID + '_background.jpg'
   );
+
+  const handleAddFollow = async () => {
+    addFollow(currentUser.uid, userUID);
+  };
 
   useEffect(() => {
     getDownloadURL(avatarStorageRef)
@@ -90,6 +94,8 @@ function PokazProfil() {
           className="avatar"
         />
         <span className="displayName">{userName}</span>
+        <br/>
+        <button onClick={handleAddFollow}>Follow</button>
         <br></br>
         {isUserDataLoaded ? (
           <div>
