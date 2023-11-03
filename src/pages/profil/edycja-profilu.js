@@ -5,15 +5,7 @@ import './edycja-profilu.css';
 import { AuthContext } from '../../context/AuthContext';
 import Image from './img/avatar_default.jpg';
 import DefaultBackgroundImage from './img/bg_user_default.jpg';
-
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  orderBy,
-} from 'firebase/firestore/lite';
+import UserPostsFetcher from './posts';
 
 function EdycjaProfilu() {
   const { currentUser } = useContext(AuthContext);
@@ -24,7 +16,6 @@ function EdycjaProfilu() {
   const [tempDescription, setTempDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
-  const [userPosts, setUserPosts] = useState([]);
 
   const fileInputRef = useRef(null);
   const avatarRef = useRef(null);
@@ -132,30 +123,6 @@ function EdycjaProfilu() {
     setIsEditingDescription(false);
   };
 
-  // załadowanie postów użytkownika
-  const fetchUserPosts = async (uid) => {
-    const db = getFirestore();
-    const postsCollection = collection(db, 'wpisy');
-    const q = query(postsCollection, where('UID', '==', uid), orderBy('Timestamp', 'desc'));
-
-    try {
-      const querySnapshot = await getDocs(q);
-      const posts = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setUserPosts(posts);
-    } catch (error) {
-      console.error('Błąd podczas pobierania postów:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (currentUser.uid) {
-      fetchUserPosts(currentUser.uid);
-    }
-  }, [currentUser.uid]);
-
   return (
     <div className="infoProfil">
       <div className="tloProfilu">
@@ -207,14 +174,7 @@ function EdycjaProfilu() {
           ref={fileInputRef}
         />
       </div>
-      <div className="userPosts">
-        <h2>Twoje ostatnie dodane wpisy: </h2>
-        <ul>
-          {userPosts.map((post) => (
-            <li key={post.id}>{post.Tresc}</li>
-          ))}
-        </ul>
-      </div>
+      <UserPostsFetcher/>
     </div>
   );
 }
