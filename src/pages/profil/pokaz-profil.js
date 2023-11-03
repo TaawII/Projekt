@@ -6,6 +6,7 @@ import Image from './img/avatar_default.jpg';
 import { useParams } from "react-router-dom";
 import { getProfileDescription } from '../../firebase';
 import { getUserName } from '../../firebase';
+import UserPostsFetcher from './posts.js';
 
 function PokazProfil() {
   const { userUID } = useParams();
@@ -100,6 +101,7 @@ function PokazProfil() {
           <div>Ładowanie opisu profilu...</div>
         )}
       </div>
+      <UserPostsFetcher/>
     </div>
   );
 }
