@@ -1,20 +1,16 @@
 .infoProfil {
     flex: 0.6;
-    border-right: 1px solid gray;
+    border-right: 2px solid gray;
+    border-left: 2px solid gray;
     overflow-y: scroll;
     min-width: fit-content;
-}
-
-.naglowek {
-    margin: auto;
-    text-align: center;
-    border-bottom: 1px solid black;
 }
 
 .tloProfilu {
     height: 281.25px;
     width: 800px;
     cursor: pointer;
+    border-bottom: 5px solid gray;
 }
 
 .clickable:hover {
@@ -23,8 +19,10 @@
     cursor: pointer;
 }
 
+
 .info {
-    border-bottom: 1px solid black;
+    padding-bottom: 20px;
+    border-bottom: 5px solid gray;
 }
 
 .avatar {
@@ -46,10 +44,11 @@
     font-size: 30px;
 }
 
-.description{
+.description {
     padding-bottom: 15px;
     padding-left: 30px;
 }
+
 
 .userPosts{
     max-width: 800px;
@@ -61,7 +60,7 @@
     min-height: 100px;
     padding: 8px;
     font-size: 14px;
-    border: 1px solid #ccc;
+    border: 3px solid #ccc;
     border-radius: 4px;
     resize: none;
   }
@@ -74,4 +73,28 @@
     padding-left: 25px;
     padding-right: 25px;
     padding-bottom: 25px;
+    transition: all 0.5s ease-in;
   }
+
+.descButton {
+    margin: 0 auto;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 30px;
+    margin-inline: 5px;
+    background-color: transparent;
+}
+
+.descButton > h2 {
+    font-size: 20px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.descButton:hover{
+    background-color: rgb(249, 176, 19);
+    border-radius: 30px;
+    transition: color 100ms ease-out;
+    color: rgb(255, 255, 255);
+}

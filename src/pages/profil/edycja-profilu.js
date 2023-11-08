@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/AuthContext';
 import Image from './img/avatar_default.jpg';
 import DefaultBackgroundImage from './img/bg_user_default.jpg';
 import UserPostsFetcher from './posts';
+import Zakladka from '../home/panel-boczny-zakladki';
 
 function EdycjaProfilu() {
   const { currentUser } = useContext(AuthContext);
@@ -132,6 +133,7 @@ function EdycjaProfilu() {
               src={backgroundImage}
               alt="BackgroundImage"
               className="tloProfilu"
+              title="Kliknij, aby zmienić tło"
             />
           )}
         </div>
@@ -146,7 +148,7 @@ function EdycjaProfilu() {
         />
         <span className="displayName">{currentUser.displayName}</span>
         <br></br>
-        {isEditingDescription ? (
+        {isEditingDescription ?  (
   <div className='editText'>
     <textarea
       className="editTextarea"  
@@ -154,8 +156,8 @@ function EdycjaProfilu() {
       onChange={(e) => setDescription(e.target.value)}
       placeholder="Dodaj opis..."
     />
-    <button onClick={handleSaveDescription}>Zapisz</button>
-    <button onClick={handleCancelDescription}>Anuluj</button>
+    <button className="descButton" onClick={handleSaveDescription}><h2>Zapisz</h2></button>
+    <button className="descButton" onClick={handleCancelDescription}><h2>Anuluj</h2></button>
   </div>
 ) : isUserDataLoaded ? (
   <div className='description'>
