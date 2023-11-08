@@ -7,6 +7,9 @@ import { useParams } from "react-router-dom";
 import { getProfileDescription } from '../../firebase';
 import { getUserName, addFollow } from '../../firebase';
 import UserPostsFetcher from './posts.js';
+import './pokaz-profil.css';
+import SpatialTrackingIcon from '@mui/icons-material/SpatialTracking';
+import MessageIcon from '@mui/icons-material/Message';
 
 function PokazProfil() {
   const { userUID } = useParams();
@@ -95,7 +98,10 @@ function PokazProfil() {
         />
         <span className="displayName">{userName}</span>
         <br/>
-        <button onClick={handleAddFollow}>Follow</button>
+        <div className="inner">
+        <button className="followButton" onClick={handleAddFollow}><h2><SpatialTrackingIcon />Follow</h2></button>
+        <button className="sendMsgButton"><h2><MessageIcon />Wyślij wiadomość</h2></button>
+        </div>
         <br></br>
         {isUserDataLoaded ? (
           <div>
