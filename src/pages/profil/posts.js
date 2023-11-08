@@ -30,7 +30,7 @@ function UserPostsFetcher() {
 
         for (const post of posts) {
           const storage = getStorage();
-          const avatarRef = ref(storage, `avatars/${post.UID}.jpg`);
+          const avatarRef = ref(storage, `${post.UID}.png`);
 
           getDownloadURL(avatarRef)
             .then((url) => {
@@ -52,7 +52,7 @@ function UserPostsFetcher() {
 
   return (
     <div className="userPosts">
-      <h2>Ostatnio dodane wpisy:</h2>
+      <h2>Ostatnia aktywność:</h2>
       <ul>
         {userPosts.map((post) => (
           <li key={post.id} className="post">
