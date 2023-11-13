@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import './post.css';
-import { getPost, addCom, updatePost, deletePost } from '../../firebase';
+import { getPostFollow, addCom, updatePost, deletePost } from '../../firebase';
 import { AuthContext } from '../../context/AuthContext';
 import { RenderCom } from './com.js';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -237,13 +237,14 @@ function Post({ post }) {
 }
 
 function PostList() {
+  const { currentUser } = useContext(AuthContext);
   const [postList, setPostList] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchPost() {
       try {
-        const posts = await getPost('wpisy');
+        const posts = await getPostFollow('wpisy', currentUser.uid);
         setPostList(posts);
       } catch (error) {
         setError(error);
