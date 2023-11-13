@@ -17,6 +17,60 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
+async function getPostFollow(collectionName, userUid) {
+  try {
+    // Pobierz tablicę Follow
+    const followArray = await getFollowArray(userUid);
+
+    // Przygotuj zapytanie do kolekcji
+    const Collection = collection(db, collectionName);
+    const q = query(Collection, where("UID", "in", Object.keys(followArray)), orderBy("Timestamp", "desc"), limit(5));
+
+    // Pobierz Snapshot
+    const Snapshot = await getDocs(q);
+
+    // Przetwórz dane
+    const List = Snapshot.docs.map((doc) => {
+      const docID = doc.id;
+      const docData = doc.data();
+      return { id: docID, ...docData };
+    });
+
+    console.log(List);
+    return List;
+  } catch (error) {
+    console.error('Błąd podczas pobierania wpisów:', error);
+    return [];
+  }
+}
+
+async function getFollowArray(userUID) {
+  try {
+    const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const documentSnapshot = querySnapshot.docs[0];
+
+      if (documentSnapshot.exists()) {
+        let followArray = documentSnapshot.data().Follow || {};
+
+        followArray[userUID] = 'Follow';
+
+        console.log('Obiekt "Follow":', followArray);
+
+        return followArray;
+      }
+    } else {
+      console.log('Nie znaleziono dokumentu o podanym UserUID.');
+      return { [userUID]: 'Follow' };
+    }
+  } catch (error) {
+    console.error('Błąd podczas pobierania obiektu "Follow":', error);
+    return { [userUID]: 'Follow' };
+  }
+}
+
 async function getUserUid(userName) {
   const Colection = collection(db, 'user');
   const q = query(Colection,where("UserName", "==", userName), limit(1));
@@ -31,6 +85,7 @@ async function getUserUid(userName) {
   console.log(List);
   return List;
 }
+
 async function addFollow(userUID, userID) {
   try {
     const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
@@ -56,6 +111,7 @@ async function addFollow(userUID, userID) {
     console.error('Błąd podczas dodawania reakcji:', error);
   }
 }
+
 async function getUserName(userUID) {
   const Colection = collection(db, 'user');
   const q = query(Colection,where("UserUID", "==", userUID), limit(1));
@@ -293,7 +349,7 @@ export const auth = getAuth(app);
 export const storage = getStorage();
 
 
-export {addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
+export {getPostFollow, addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
 
 
 export default app;
