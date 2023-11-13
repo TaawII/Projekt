@@ -87,6 +87,10 @@ function Post({ post }) {
       };
       addCom('com', ComData);
       setNewComment('');
+      setShowComments(false);
+      setTimeout(() => {
+        setShowComments(true);
+      }, 200);
     }
   };
 
