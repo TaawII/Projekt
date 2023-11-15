@@ -99,8 +99,8 @@ function PokazProfil() {
         <span className="displayName">{userName}</span>
         <br/>
         <div className="inner">
-        <button className="followButton" onClick={handleAddFollow}><h2><SpatialTrackingIcon />Follow</h2></button>
-        <button className="sendMsgButton"><h2><MessageIcon />Wyślij wiadomość</h2></button>
+        <button className="followButton" onClick={handleAddFollow}><h2><SpatialTrackingIcon className="followIcon"/>Obserwuj</h2></button>
+        <button className="sendMsgButton"><h2><MessageIcon className="sendMsgIcon"/>Wyślij wiadomość</h2></button>
         </div>
         <br></br>
         {isUserDataLoaded ? (

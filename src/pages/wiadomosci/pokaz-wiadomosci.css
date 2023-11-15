@@ -1,0 +1,54 @@
+.inboxView {
+    flex: 0.6;
+    border-right: 2px solid gray;
+    border-left: 2px solid gray;
+    overflow-y: scroll;
+    min-width: fit-content;
+}
+
+.titleInbox {
+    margin-top: 50px;
+    margin-left: 20px;
+}
+
+.titleInbox > h2 {
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+
+.shortInfoInbox {
+    margin-top: 30px;
+    margin-left: 10px;
+}
+
+.buttonSendMsg {
+    margin-top: 50px;
+    margin-left: 15px;
+}
+
+.sendMsg {
+    margin: 0 auto;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 30px;
+    margin-inline: 5px;
+    background-color: transparent;
+}
+
+.sendMsg > h2 {
+    font-size: 30px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.sendMsg:hover {
+    background-color: rgb(249, 176, 19);
+    border-radius: 30px;
+    transition: color 100ms ease-out;
+    color: rgb(255, 255, 255);
+}
+
+.msgIcon {
+    padding-top: 3px;
+    transform: scale(1.3);
+}
