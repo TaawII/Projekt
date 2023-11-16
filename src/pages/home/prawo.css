@@ -16,6 +16,7 @@
     align-items: center;
     max-width: 300px;
     margin: 0 auto;
+    position: relative;
   }
   
   .search-container {
@@ -56,4 +57,14 @@
   .MuiSvgIcon-root {
     font-size: 24px; 
     margin-right: 8px; 
+  }
+
+  .error {
+    color: red;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    margin-top: 5px;
   }

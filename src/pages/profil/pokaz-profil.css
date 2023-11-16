@@ -22,6 +22,16 @@
     color: rgb(255, 255, 255);
 }
 
+.followIcon {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
+.sendMsgIcon {
+    padding-top: 5px;
+    padding-left: 5px;
+}
+
 .sendMsgButton {
     margin: 0 auto;
     align-items: center;

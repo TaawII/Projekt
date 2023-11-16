@@ -13,6 +13,7 @@ const Login = () => {
   });
   const [toggleEye, setToggleEye] = useState(false);
   const [inputType, setInputType] = useState("password");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const { dispatch } = useContext(AuthContext);
@@ -25,19 +26,22 @@ const Login = () => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     dispatch({ type: "LOGIN_START" });
     try {
-      signInWithEmailAndPassword(auth, inputs.email, inputs.password).then(
-        (userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          dispatch({ type: "LOGIN_SUCCESS", payload: user });
-          navigate("/");
-        }
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        inputs.email,
+        inputs.password
       );
+      // Zalogowano pomyślnie
+      const user = userCredential.user;
+      console.log("Zalogowano pomyslnie");
+      dispatch({ type: "LOGIN_SUCCESS", payload: user });
+      navigate("/");
     } catch (error) {
+      setError("Błędny email lub hasło. Spróbuj ponownie.");
       dispatch({ type: "LOGIN_FAILURE" });
     }
   };
@@ -46,6 +50,7 @@ const Login = () => {
     <div className="login">
       <form>
         <h2>Logowanie</h2>
+        {error && <div className="errorLogin">{error}</div>}
         <div className="formInput">
           <input
             type="email"
