@@ -62,21 +62,21 @@
     scrollbar-width: none; 
 }
 
-input {
+.inboxView input {
     padding: 10px;
     font-size: 16px;
-    border: 2px solid #3498db;
+    border: 2px solid rgb(219, 77, 52);
     border-radius: 5px;
     width: 300px;
     outline: none;
     transition: border-color 0.3s;
   }
   
-  input::placeholder {
+  .inboxView input::placeholder {
     color: #95a5a6;
   }
   
-  input:focus {
-    border-color: #2ecc71;
-    box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+  .inboxView input:focus {
+    border-color: rgb(255, 183, 3);
+    box-shadow: 0 0 5px rgba(236, 186, 3, 0.5);
   }
