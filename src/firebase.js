@@ -4,6 +4,17 @@ import { getAuth, updateProfile } from "firebase/auth";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit, getDoc, setDoc } from 'firebase/firestore/lite';
 
+export {
+  db,
+  collection,
+  getDocs,
+  addDoc, 
+  query,
+  orderBy,
+  where,
+  limit,
+};
+
 const firebaseConfig = {
   apiKey: "AIzaSyCcGyQDGL55AL5U3gGYsBk8sp5bfwBj970",
   authDomain: "projekt-zespolowy-baza.firebaseapp.com",
