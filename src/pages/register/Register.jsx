@@ -14,8 +14,6 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    phoneNumber: "",
-    dateOfBirth: "",
   });
   const navigate = useNavigate();
   const inputs = [
@@ -56,20 +54,6 @@ const Register = () => {
       pattern: inputValues.password,
       required: true,
     },
-    {
-      id: 5,
-      name: "phoneNumber",
-      type: "text",
-      placeholder: "Numer telefonu",
-      required: false,
-    },
-    {
-      id: 6,
-      name: "dateOfBirth",
-      type: "date",
-      placeholder: "Data urodzenia",
-      required: true,
-    },
   ];
 
   const handleChange = (e) => {
@@ -88,6 +72,7 @@ const Register = () => {
         const RegData = {
           UserName: inputValues.username,
           UserUID: userCredential.user.uid,
+          Timestamp: new Date(),
         };
         addNewUser(RegData);
         // Signed in
