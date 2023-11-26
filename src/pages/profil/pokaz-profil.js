@@ -5,7 +5,7 @@ import DefaultBackgroundImage from './img/bg_user_default.jpg';
 import Image from './img/avatar_default.jpg';
 import { useParams } from "react-router-dom";
 import { getProfileDescription } from '../../firebase';
-import { getUserName, addFollow } from '../../firebase';
+import { getUserName, addFollow, checkFollow } from '../../firebase';
 import UserPostsFetcher from './posts.js';
 import './pokaz-profil.css';
 import SpatialTrackingIcon from '@mui/icons-material/SpatialTracking';
@@ -19,6 +19,8 @@ function PokazProfil() {
   const [userName, setuserName] = useState();
   const [description, setDescription] = useState(''); // Dodaj stan opisu użytkownika
   const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
+  const [isFollow, setIsUserFollow] = useState(false);
+
 
   const storage = getStorage();
   const avatarStorageRef = ref(storage, userUID + '.png');
@@ -27,9 +29,18 @@ function PokazProfil() {
     userUID + '_background.jpg'
   );
 
-  const handleAddFollow = async () => {
-    addFollow(currentUser.uid, userUID);
+    const handleAddFollow = async () => {
+      var x = await addFollow(currentUser.uid, userUID);
+      if(x)
+      setIsUserFollow(x);
+    };
+
+  const handleRemoveFollow = async () => {
+    var x = await addFollow(currentUser.uid, userUID);
+    if(x)
+    setIsUserFollow(false);
   };
+
 
   useEffect(() => {
     getDownloadURL(avatarStorageRef)
@@ -47,7 +58,13 @@ function PokazProfil() {
       .catch((error) => {
         console.error('Błąd podczas pobierania tła:', error);
       });
-  }, [userUID]);
+
+    const fetchData = async () => {
+      const result = await checkFollow(currentUser.uid, userUID);
+      setIsUserFollow(result);
+    };
+    fetchData();
+  }, [userUID, currentUser.uid]);
 
   useEffect(() => {
     getProfileDescription(userUID)
@@ -99,7 +116,13 @@ function PokazProfil() {
         <span className="displayName">{userName}</span>
         <br/>
         <div className="inner">
-        <button className="followButton" onClick={handleAddFollow}><h2><SpatialTrackingIcon className="followIcon"/>Obserwuj</h2></button>
+          {isFollow?
+            (
+              <button className="followButton" onClick={handleRemoveFollow}><h2><SpatialTrackingIcon className="followIcon"/>Przestan Obserwowac</h2></button>
+            ):(
+              <button className="followButton" onClick={handleAddFollow}><h2><SpatialTrackingIcon className="followIcon"/>Obserwuj</h2></button>
+            )
+          }
         <button className="sendMsgButton"><h2><MessageIcon className="sendMsgIcon"/>Wyślij wiadomość</h2></button>
         </div>
         <br></br>

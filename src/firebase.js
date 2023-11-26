@@ -28,6 +28,27 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
+// userUID - IdProfilu, userID - nasze id
+async function checkFollow(userUID, userID) {
+  try {
+    const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
+    const querySnapshot = await getDocs(q);
+    const documentSnapshot = querySnapshot.docs[0];
+
+    if (documentSnapshot.exists()) {
+      const currentFollow = documentSnapshot.data().Follow || {};
+
+     if (currentFollow[userID]) {
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error('Błąd podczas sprawdzania Follow:', error);
+    return false;
+  }
+  return false;
+}
+
 async function getPostFollow(collectionName, userUid) {
   try {
     // Pobierz tablicę Follow
@@ -108,18 +129,29 @@ async function addFollow(userUID, userID) {
       if (documentSnapshot.exists()) {
         const currentFollow = documentSnapshot.data().Follow || {};
 
-        if (!currentFollow[userID]) {
+        if (currentFollow[userID]) {
+          // Jeżeli follow już istnieje, usuwamy go
+          delete currentFollow[userID];
+
+          const reactionRef = doc(db, 'user', documentSnapshot.id);
+          await updateDoc(reactionRef, { Follow: currentFollow });
+          return true;
+        } else {
+          // Jeżeli follow nie istnieje, dodajemy go
           currentFollow[userID] = 'Follow';
 
           const reactionRef = doc(db, 'user', documentSnapshot.id);
           await updateDoc(reactionRef, { Follow: currentFollow });
+          return true;
         }
       }
     } else {
       console.log('Nie znaleziono dokumentu o podanym UserUID.');
+      return false;
     }
   } catch (error) {
-    console.error('Błąd podczas dodawania reakcji:', error);
+    console.error('Błąd podczas dodawania/usuwania follow:', error);
+    return false;
   }
 }
 
@@ -360,7 +392,7 @@ export const auth = getAuth(app);
 export const storage = getStorage();
 
 
-export {getPostFollow, addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
+export {checkFollow, getPostFollow, addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
 
 
 export default app;
