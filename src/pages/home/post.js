@@ -14,10 +14,15 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import { Avatar } from "@mui/material"
-import { addReaction, getReactionsFromDatabase, removeReaction } from '../../firebase';
+import { addReaction, getReactionsFromDatabase, removeReaction, addRetweet, removeRetweet } from '../../firebase';
 import { formatDistanceToNow } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { getStorage, ref, getDownloadURL } from "firebase/storage"; 
+import { db } from '../../firebase';
+import { getDocs, collection, query, where } from 'firebase/firestore/lite';
+import { Link } from 'react-router-dom';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 function Post({ post }) {
   const { currentUser } = useContext(AuthContext);
@@ -27,9 +32,36 @@ function Post({ post }) {
   const [newComment, setNewComment] = useState('');
   const [showComments, setShowComments] = useState(false);
   const [reactions, setReactions] = useState({ like: 0 });
-  const [userPhotoURL, setUserPhotoURL] = useState(''); // Dodaj stan dla zdjęcia profilowego
+  const [userPhotoURL, setUserPhotoURL] = useState(''); 
+  const [isRetweeted, setIsRetweeted] = useState(false);
+  const [isShared, setIsShared] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const currentUserUID = currentUser.uid;
+
+  const handleRetweetClick = async () => {
+    if (!isRetweeted) {
+      const userID = currentUser.uid;
+      const RetweetData = {
+        PostId: post.id,
+        UserID: userID,
+        Timestamp: new Date(),
+      };
+      await addRetweet('retweets', RetweetData);
+      setIsRetweeted(true);
+      setIsShared(true);
+      localStorage.setItem(`retweet_${post.id}`, 'true');
+      setAlertOpen(true);
+      setTimeout(() => {
+        setAlertOpen(false);
+      }, 5000);
+    } else {
+      const userID = currentUser.uid;
+      await removeRetweet('retweets', post.id, userID);
+      setIsRetweeted(false);
+      localStorage.removeItem(`retweet_${post.id}`);
+    }
+  };
 
   const handleShowFooter = () => {
     setShowComments(!showComments);
@@ -95,6 +127,9 @@ function Post({ post }) {
   };
 
   useEffect(() => {
+    const isRetweetedLocalStorage = localStorage.getItem(`retweet_${post.id}`);
+    setIsRetweeted(isRetweetedLocalStorage === 'true');
+
     const fetchReactions = async () => {
       try {
         const fetchedReactions = await getReactionsFromDatabase(post.id);
@@ -104,7 +139,24 @@ function Post({ post }) {
       }
     };
 
+    const fetchRetweetStatus = async () => {
+      try {
+        const retweetsCollection = collection(db, 'retweets'); 
+        const q = query(retweetsCollection, where('PostId', '==', post.id), where('UserID', '==', currentUser.uid));
+        const snapshot = await getDocs(q);
+    
+        if (!snapshot.empty) {
+          console.log('Użytkownik zretweetował ten post.');
+        } else {
+          console.log('Użytkownik nie retweetował tego posta.');
+        }
+      } catch (error) {
+        console.error('Błąd podczas sprawdzania statusu retweeta:', error);
+      }
+    };
+
     fetchReactions();
+    fetchRetweetStatus();
 
     const storage = getStorage();
     const avatarRef = ref(storage, `${post.UID}.png`);
@@ -116,7 +168,8 @@ function Post({ post }) {
       .catch((error) => {
         console.error('Błąd podczas pobierania avatara z Firebase Storage:', error);
       });
-  }, [post.id, post.UID]);
+
+  }, [post.id, post.UID, currentUser.uid]);
 
   const handleLikeClick = async () => {
     const reactionType = 'lubie';
@@ -146,7 +199,9 @@ function Post({ post }) {
       <div className="userPost">
         <Avatar alt={post.Pseudonim} src={userPhotoURL} />
         <div>
+        <Link to={`/userprofile/${post.UID}`}>
           <strong>{post.Pseudonim}</strong>
+        </Link>
           <div className="postTime">
             {post.Timestamp
               ? `${formatDistanceToNow(post.Timestamp.toDate(), {
@@ -206,10 +261,18 @@ function Post({ post }) {
         <div className="reaction" onClick={handleShowFooter}>
           <ChatBubbleOutlineIcon fontSize="small" style={{ cursor: 'pointer' }} />
         </div>
-        <div className="reaction">
-          <RepeatIcon fontSize="small" />
+        <div className="reaction" onClick={handleRetweetClick}>
+          <RepeatIcon
+            fontSize="small"
+            style={{ color: isRetweeted ? 'green' : 'inherit', cursor: 'pointer' }}
+          />
         </div>
       </div>
+      <Snackbar open={alertOpen} autoHideDuration={5000} onClose={() => setAlertOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+        <Alert onClose={() => setAlertOpen(false)} severity="success">
+          Wpis został udostępniony!
+        </Alert>
+      </Snackbar>
       {showComments && (
         <div className="newComment">
           <form onSubmit={handleCommentSubmit}>
@@ -252,13 +315,13 @@ function PostList() {
     }
 
     fetchPost();
-  }, []);
+  }, [currentUser.uid]);
 
   return (
     <div>
-{postList.map((post, index) => (
-  <Post key={post.id} post={post} addCom={addCom} />
-))}
+      {postList.map((post, index) => (
+        <Post key={post.id} post={post} addCom={addCom} />
+      ))}
       {error && <div>Error: {error.message}</div>}
     </div>
   );

@@ -1,14 +1,13 @@
-// połączenie z bazą danych na Firebase
-import { initializeApp} from "firebase/app";
-import { getAuth, updateProfile } from "firebase/auth";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { where, doc, deleteDoc, updateDoc, getFirestore, collection, getDocs, addDoc, query, orderBy, limit, getDoc, setDoc } from 'firebase/firestore/lite';
+import { initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirestore, collection, getDocs, addDoc, query, orderBy, where, limit, getDoc, setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore/lite'; 
 
 export {
   db,
   collection,
   getDocs,
-  addDoc, 
+  addDoc,
   query,
   orderBy,
   where,
@@ -25,8 +24,7 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
+const db = getFirestore(app); 
 
 async function getPostFollow(collectionName, userUid) {
   try {
@@ -354,6 +352,38 @@ export const getProfileDescription = async (uid) => {
 export const updateProfileDescription = async (uid, description) => {
   const userDocRef = doc(db, 'description', uid);
   await setDoc(userDocRef, { description });
+};
+
+export const addRetweet = async (collectionName, data) => {
+  const retweetsCollection = collection(db, collectionName); 
+
+  try {
+    await addDoc(retweetsCollection, data); 
+    console.log('Dodano retweet do bazy danych.');
+  } catch (error) {
+    console.error('Błąd podczas dodawania retweetu:', error);
+    throw error;
+  }
+};
+
+export const removeRetweet = async (collectionName, postId, userId) => {
+  const retweetsCollection = collection(db, collectionName);
+
+  try {
+    const q = query(retweetsCollection, where('PostId', '==', postId), where('UserID', '==', userId));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+      const retweetId = snapshot.docs[0].id;
+      await deleteDoc(doc(retweetsCollection, retweetId));
+      console.log('Usunięto retweet z bazy danych.');
+    } else {
+      console.log('Brak retweetu do usunięcia.');
+    }
+  } catch (error) {
+    console.error('Błąd podczas usuwania retweetu:', error);
+    throw error;
+  }
 };
 
 export const auth = getAuth(app);
