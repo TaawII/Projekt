@@ -27,6 +27,36 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); 
 
 // userUID - IdProfilu, userID - nasze id
+async function removeFollow(userUID, userID) {
+  try {
+    const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const documentSnapshot = querySnapshot.docs[0];
+
+      if (documentSnapshot.exists()) {
+        const currentFollow = documentSnapshot.data().Follow || {};
+
+        if (currentFollow[userID]) {
+          // Jeżeli follow już istnieje, usuwamy go
+          delete currentFollow[userID];
+
+          const reactionRef = doc(db, 'user', documentSnapshot.id);
+          await updateDoc(reactionRef, { Follow: currentFollow });
+          return true;
+        }
+      }
+    } else {
+      console.log('Nie znaleziono dokumentu o podanym UserUID.');
+      return false;
+    }
+  } catch (error) {
+    console.error('Błąd podczas usuwania follow:', error);
+    return false;
+  }
+}
+
 async function checkBlocked(userUID,userID) {
   try {
     const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
@@ -80,6 +110,8 @@ async function changeBlocked(userUID, userID) {
 
           const reactionRef = doc(db, 'user', documentSnapshot.id);
           await updateDoc(reactionRef, { Blocked: currentBan });
+          // oraz zdejmujemy mu followa
+          await removeFollow(userUID,userID);
           return true;
         }
       }
