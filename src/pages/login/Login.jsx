@@ -21,7 +21,7 @@ const Login = () => {
     const checkUser = () => {
       const user = auth.currentUser;
       if (user) {
-        console.log("Zalogowano pomyslnie");
+        console.log("Zalogowano pomyślnie");
         dispatch({ type: "LOGIN_SUCCESS", payload: user });
         navigate("/");
       }
@@ -98,7 +98,13 @@ const Login = () => {
             style={{ textDecoration: "none" }}
           >
             {" "}
-            Zarejestruj się
+            Zarejestruj się.
+          </Link>
+        </div>
+
+        <div className="formLink">
+          <Link to="/reset" style={{ textDecoration: "none" }}>
+            Zapomniałeś hasła? Zresetuj je tutaj.
           </Link>
         </div>
       </form>

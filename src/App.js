@@ -12,6 +12,8 @@ import Register from "./pages/register/Register";
 import Profil from "./pages/profil/Profil";
 import Wiadomosci from "./pages/wiadomosci/Wiadomosci";
 import UserProfil from "./pages/profil/UserProfile";
+import ResetPassword from "./pages/reset/ResetPassword";
+
 function App() {
   const { currentUser } = useContext(AuthContext);
 
@@ -27,6 +29,10 @@ function App() {
     {
       path: "/register",
       element: <Register />,
+    },
+    {
+      path: "/reset",
+      element: <ResetPassword />,
     },
     {
       path: `/userprofile/:userUID`,
