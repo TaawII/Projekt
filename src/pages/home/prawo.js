@@ -77,10 +77,12 @@ function Prawo() {
         <h3>Sugerowani użytkownicy:</h3>
         <ul className="userList">
           {latestUsers.map((user) => (
-            <li key={user.id}>
+            <li key={user.id} className="userListItem">
               <Link to={`/userprofile/${user.UserUID}`} className="userLink">
+              <div className="userContainer">
                 <img src={user.avatarURL} alt="Avatar" className="userAvatar" />
                 <p className="userName">{user.UserName}</p>
+              </div>
               </Link>
             </li>
           ))}
