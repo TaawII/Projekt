@@ -5,7 +5,7 @@ import DefaultBackgroundImage from './img/bg_user_default.jpg';
 import Image from './img/avatar_default.jpg';
 import { useParams } from "react-router-dom";
 import { getProfileDescription } from '../../firebase';
-import { getUserName, addFollow, checkFollow } from '../../firebase';
+import { checkBlocked, getUserName, addFollow, checkFollow } from '../../firebase';
 import UserPostsFetcher from './posts.js';
 import './pokaz-profil.css';
 import SpatialTrackingIcon from '@mui/icons-material/SpatialTracking';
@@ -20,6 +20,7 @@ function PokazProfil() {
   const [description, setDescription] = useState(''); // Dodaj stan opisu użytkownika
   const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
   const [isFollow, setIsUserFollow] = useState(false);
+  const [isBlocked, setBlocked] = useState(false);
 
 
   const storage = getStorage();
@@ -29,20 +30,25 @@ function PokazProfil() {
     userUID + '_background.jpg'
   );
 
-    const handleAddFollow = async () => {
-      var x = await addFollow(currentUser.uid, userUID);
-      if(x)
-      setIsUserFollow(x);
-    };
+  const handleAddFollow = async () => {
+    var x = await addFollow(currentUser.uid, userUID);
+    if(x)
+      setIsUserFollow(true);
+  };
 
   const handleRemoveFollow = async () => {
     var x = await addFollow(currentUser.uid, userUID);
     if(x)
-    setIsUserFollow(false);
+      setIsUserFollow(false);
   };
 
-
   useEffect(() => {
+    const checkBlockedStatus = async () => {
+      const isBlocked = await checkBlocked(userUID, currentUser.uid);
+      setBlocked(isBlocked);
+    };
+    checkBlockedStatus();
+    
     getDownloadURL(avatarStorageRef)
       .then((url) => {
         setUserPhotoURL(url);
@@ -95,50 +101,85 @@ function PokazProfil() {
 
 
   return (
-    <div className="infoProfil">
-      <div className="tloProfilu">
-        <div className="background-image-container">
-          {backgroundImage && (
-            <img
-              src={backgroundImage}
-              alt="BackgroundImage"
-              className="tloProfilu"
-            />
-          )}
-        </div>
-      </div>
-      <div className="info">
-        <img
-          src={userPhotoURL}
-          alt="Avatar"
-          className="avatar"
-        />
-        <span className="displayName">{userName}</span>
-        <br/>
-        <div className="inner">
-          {isFollow?
-            (
-              <button className="followButton" onClick={handleRemoveFollow}><h2><SpatialTrackingIcon className="followIcon"/>Przestan Obserwowac</h2></button>
-            ):(
-              <button className="followButton" onClick={handleAddFollow}><h2><SpatialTrackingIcon className="followIcon"/>Obserwuj</h2></button>
-            )
-          }
-        <button className="sendMsgButton"><h2><MessageIcon className="sendMsgIcon"/>Wyślij wiadomość</h2></button>
-        </div>
-        <br></br>
-        {isUserDataLoaded ? (
-          <div>
-            <span className="userDescription">
-              {description || 'Dodaj opis...'}
-            </span>
+    <div>
+      {isBlocked ? (
+        <div className="infoProfil">
+          <div className="tloProfilu">
+            <div className="background-image-container">
+              {backgroundImage && (
+                <img
+                  src={backgroundImage}
+                  alt="BackgroundImage"
+                  className="tloProfilu"
+                />
+              )}
+            </div>
           </div>
-        ) : (
-          <div>Ładowanie opisu profilu...</div>
-        )}
-      </div>
-      <UserPostsFetcher/>
+          <div className="info">
+            <p>Zostałeś zablokowany</p>
+          </div>
+        </div>
+      ) : (
+        <div className="infoProfil">
+          <div className="tloProfilu">
+            <div className="background-image-container">
+              {backgroundImage && (
+                <img
+                  src={backgroundImage}
+                  alt="BackgroundImage"
+                  className="tloProfilu"
+                />
+              )}
+            </div>
+          </div>
+          <div className="info">
+            <img
+              src={userPhotoURL}
+              alt="Avatar"
+              className="avatar"
+            />
+            <span className="displayName">{userName}</span>
+            <br />
+            <div className="inner">
+              {isFollow ? (
+                <button className="followButton" onClick={handleRemoveFollow}>
+                  <h2>
+                    <SpatialTrackingIcon className="followIcon" />
+                    Przestań Obserwować
+                  </h2>
+                </button>
+              ) : (
+                <button className="followButton" onClick={handleAddFollow}>
+                  <h2>
+                    <SpatialTrackingIcon className="followIcon" />
+                    Obserwuj
+                  </h2>
+                </button>
+              )}
+              <button className="sendMsgButton">
+                <h2>
+                  <MessageIcon className="sendMsgIcon" />
+                  Wyślij wiadomość
+                </h2>
+              </button>
+            </div>
+            <br />
+            {isUserDataLoaded ? (
+              <div>
+                <span className="userDescription">
+                  {description || 'Dodaj opis...'}
+                </span>
+              </div>
+            ) : (
+              <div>Ładowanie opisu profilu...</div>
+            )}
+          </div>
+          <UserPostsFetcher />
+        </div>
+      )}
     </div>
   );
+  
 }
 
 
