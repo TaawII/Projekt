@@ -27,6 +27,104 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); 
 
 // userUID - IdProfilu, userID - nasze id
+async function removeFollow(userUID, userID) {
+  try {
+    const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const documentSnapshot = querySnapshot.docs[0];
+
+      if (documentSnapshot.exists()) {
+        const currentFollow = documentSnapshot.data().Follow || {};
+
+        if (currentFollow[userID]) {
+          // Jeżeli follow już istnieje, usuwamy go
+          delete currentFollow[userID];
+
+          const reactionRef = doc(db, 'user', documentSnapshot.id);
+          await updateDoc(reactionRef, { Follow: currentFollow });
+          return true;
+        }
+      }
+    } else {
+      console.log('Nie znaleziono dokumentu o podanym UserUID.');
+      return false;
+    }
+  } catch (error) {
+    console.error('Błąd podczas usuwania follow:', error);
+    return false;
+  }
+}
+
+async function checkBlocked(userUID,userID) {
+  try {
+    const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const documentSnapshot = querySnapshot.docs[0];
+
+      if (documentSnapshot.exists()) {
+        let blockedArray = documentSnapshot.data().Blocked || {};
+        if (blockedArray[userID]) {
+          console.log("Jestes zablokowany!");
+          return true;
+        } else {
+          console.log("Nie jestes zablokowany!");
+          return false;
+        }
+      }
+    } else {
+      console.log('Nie znaleziono dokumentu o podanym UserUID.');
+      return false;
+    }
+  } catch (error) {
+    console.error('Błąd podczas pobierania obiektu "Blocked":', error);
+    return false;
+  }
+  return false;
+}
+
+async function changeBlocked(userUID, userID) {
+  try {
+    const q = query(collection(db, 'user'), where("UserUID", "==", userID));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const documentSnapshot = querySnapshot.docs[0];
+
+      if (documentSnapshot.exists()) {
+        const currentBan = documentSnapshot.data().Blocked || {};
+
+        if (currentBan[userUID]) {
+          // Jeżeli Blokada już istnieje, usuwamy go
+          delete currentBan[userUID];
+
+          const reactionRef = doc(db, 'user', documentSnapshot.id);
+          await updateDoc(reactionRef, { Blocked: currentBan });
+          return true;
+        } else {
+          // Jeżeli Blokada nie istnieje, dodajemy go
+          currentBan[userUID] = 'Blocked';
+
+          const reactionRef = doc(db, 'user', documentSnapshot.id);
+          await updateDoc(reactionRef, { Blocked: currentBan });
+          // oraz zdejmujemy mu followa
+          await removeFollow(userUID,userID);
+          return true;
+        }
+      }
+    } else {
+      console.log('Nie znaleziono dokumentu o podanym UserUID.');
+      return false;
+    }
+  } catch (error) {
+    console.error('Błąd podczas dodawania/usuwania blokady:', error);
+    return false;
+  }
+}
+
 async function checkFollow(userUID, userID) {
   try {
     const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
@@ -422,7 +520,7 @@ export const auth = getAuth(app);
 export const storage = getStorage();
 
 
-export {checkFollow, getPostFollow, addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
+export {checkBlocked, changeBlocked, checkFollow, getPostFollow, addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
 
 
 export default app;

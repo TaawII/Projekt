@@ -1,12 +1,13 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
-import { uploadAvatar, uploadBackground, getProfileDescription, updateProfileDescription } from '../../firebase';
+import { checkBlocked, changeBlocked, uploadAvatar, uploadBackground, getProfileDescription, updateProfileDescription } from '../../firebase';
 import './edycja-profilu.css';
 import { AuthContext } from '../../context/AuthContext';
 import Image from './img/avatar_default.jpg';
 import DefaultBackgroundImage from './img/bg_user_default.jpg';
 import UserPostsFetcher from './posts';
 import Zakladka from '../home/panel-boczny-zakladki';
+import { auth, db, collection, getDocs, addDoc } from '../../firebase';
 
 function EdycjaProfilu() {
   const { currentUser } = useContext(AuthContext);
@@ -17,7 +18,9 @@ function EdycjaProfilu() {
   const [tempDescription, setTempDescription] = useState('');
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
-
+  const [uzytkownicy, setUzytkownicy] = useState([]);
+  const [odbiorcaId, setOdbiorcaId] = useState('');
+  
   const fileInputRef = useRef(null);
   const avatarRef = useRef(null);
   const storage = getStorage();
@@ -28,6 +31,27 @@ function EdycjaProfilu() {
   );
 
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const usersCollection = collection(db, 'user');
+        const usersSnapshot = await getDocs(usersCollection);
+        const usersList = usersSnapshot.docs.map(doc => {
+          const docID = doc.id;
+          const docData = doc.data();
+          return { uid: docID, ...docData };
+        });
+        setUzytkownicy(usersList);
+        console.log(usersList);
+      } catch (error) {
+        console.error('Błąd pobierania użytkowników:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+
     getDownloadURL(avatarStorageRef)
       .then((url) => {
         setUserPhotoURL(url);
@@ -57,6 +81,11 @@ function EdycjaProfilu() {
       handleAvatarChange();
     }
   }, [photo]);
+
+  const changeBan = async () => {
+    console.log(odbiorcaId);
+    await changeBlocked(odbiorcaId, currentUser.uid);
+  }
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -148,6 +177,18 @@ function EdycjaProfilu() {
         />
         <span className="displayName">{currentUser.displayName}</span>
         <br></br>
+        <select
+          value={odbiorcaId}
+          onChange={(e) => setOdbiorcaId(e.target.value)}
+        >
+          <option key="" value="">Wybierz odbiorcę</option>
+          {uzytkownicy.map(user => (
+            <option key={user.UserUID} value={user.UserUID}>{user.UserName}</option>
+          ))}
+        </select>
+        <button className="sendMsg" onClick={changeBan}>
+          <h2>Blokowanie/Odblokowanie</h2>
+        </button>
         {isEditingDescription ?  (
   <div className='editText'>
     <textarea
