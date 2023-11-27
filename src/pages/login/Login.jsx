@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -15,13 +15,26 @@ const Login = () => {
   const [inputType, setInputType] = useState("password");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
   const { dispatch } = useContext(AuthContext);
+
+  useEffect(() => {
+    const checkUser = () => {
+      const user = auth.currentUser;
+      if (user) {
+        console.log("Zalogowano pomyslnie");
+        dispatch({ type: "LOGIN_SUCCESS", payload: user });
+        navigate("/");
+      }
+    };
+
+    checkUser();
+  }, [dispatch, navigate]);
 
   const handleToggle = (e) => {
     setToggleEye(!toggleEye);
     setInputType(inputType === "password" ? "text" : "password");
   };
+
   const handleChange = (e) => {
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -29,6 +42,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     dispatch({ type: "LOGIN_START" });
+
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -37,9 +51,7 @@ const Login = () => {
       );
       // Zalogowano pomyślnie
       const user = userCredential.user;
-      console.log("Zalogowano pomyslnie");
       dispatch({ type: "LOGIN_SUCCESS", payload: user });
-      navigate("/");
     } catch (error) {
       setError("Błędny email lub hasło. Spróbuj ponownie.");
       dispatch({ type: "LOGIN_FAILURE" });
