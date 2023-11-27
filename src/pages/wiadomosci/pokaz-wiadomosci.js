@@ -71,18 +71,20 @@ function PokazWiadomosci() {
       <select
           value={odbiorcaId}
           onChange={(e) => setOdbiorcaId(e.target.value)}
+          className="msgReceiver"
         >
           <option key="" value="">Wybierz odbiorcę</option>
           {uzytkownicy.map(user => (
             <option key={user.uid} value={user.uid}>{user.UserName}</option>
           ))}
-        </select>
+        </select><br></br>
         <input
           type="text"
           placeholder="Wpisz swoją wiadomość..."
           value={wiadomosc}
           onChange={(e) => setWiadomosc(e.target.value)}
-        />
+          className="msgTextArea"
+        /><br></br>
         <button className="sendMsg" onClick={wyslijWiadomosc}>
           <h2><MessageIcon className="msgIcon"/>Wyślij wiadomość</h2>
         </button>
