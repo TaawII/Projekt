@@ -9,7 +9,6 @@ import { checkBlocked, getUserName, addFollow, checkFollow } from '../../firebas
 import UserPostsFetcher from './posts.js';
 import './pokaz-profil.css';
 import SpatialTrackingIcon from '@mui/icons-material/SpatialTracking';
-import MessageIcon from '@mui/icons-material/Message';
 
 function PokazProfil() {
   const { userUID } = useParams();
@@ -17,7 +16,7 @@ function PokazProfil() {
   const [userPhotoURL, setUserPhotoURL] = useState(currentUser.photoURL || Image);
   const [backgroundImage, setBackgroundImage] = useState(DefaultBackgroundImage);
   const [userName, setuserName] = useState();
-  const [description, setDescription] = useState(''); // Dodaj stan opisu użytkownika
+  const [description, setDescription] = useState('');
   const [isUserDataLoaded, setIsUserDataLoaded] = useState(false);
   const [isFollow, setIsUserFollow] = useState(false);
   const [isBlocked, setBlocked] = useState(false);
@@ -156,12 +155,6 @@ function PokazProfil() {
                   </h2>
                 </button>
               )}
-              <button className="sendMsgButton">
-                <h2>
-                  <MessageIcon className="sendMsgIcon" />
-                  Wyślij wiadomość
-                </h2>
-              </button>
             </div>
             <br />
             {isUserDataLoaded ? (

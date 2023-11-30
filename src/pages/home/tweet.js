@@ -8,7 +8,7 @@ import { AuthContext } from '../../context/AuthContext';
 function OpublikujForm() {
   const { currentUser } = useContext(AuthContext);
   const [PostTresc, setPostTresc] = useState('');
-  const [userPhotoURL, setUserPhotoURL] = useState(''); // Używamy pustego URL, początkowo
+  const [userPhotoURL, setUserPhotoURL] = useState('');
 
   const handleChange = (event) => {
     setPostTresc(event.target.value);
@@ -20,7 +20,7 @@ function OpublikujForm() {
 
     getDownloadURL(avatarRef)
       .then((url) => {
-        setUserPhotoURL(url); // Aktualizacja URL zdjęcia profilowego
+        setUserPhotoURL(url); 
       })
       .catch((error) => {
         console.error('Błąd podczas pobierania avatara z Firebase Storage:', error);
@@ -39,6 +39,9 @@ function OpublikujForm() {
 
     if (addNewPost('wpisy', newPostData)) {
       setPostTresc('');
+      setTimeout(() => {
+        window.location.reload();
+      }, 200);
     }
   };
 

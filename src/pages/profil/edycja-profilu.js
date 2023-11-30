@@ -1,13 +1,12 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { getStorage, ref, getDownloadURL } from 'firebase/storage';
-import { checkBlocked, changeBlocked, uploadAvatar, uploadBackground, getProfileDescription, updateProfileDescription } from '../../firebase';
+import {  changeBlocked, uploadAvatar, uploadBackground, getProfileDescription, updateProfileDescription } from '../../firebase';
 import './edycja-profilu.css';
 import { AuthContext } from '../../context/AuthContext';
 import Image from './img/avatar_default.jpg';
 import DefaultBackgroundImage from './img/bg_user_default.jpg';
 import UserPostsFetcher from './posts';
-import Zakladka from '../home/panel-boczny-zakladki';
-import { auth, db, collection, getDocs, addDoc } from '../../firebase';
+import {  db, collection, getDocs } from '../../firebase';
 
 function EdycjaProfilu() {
   const { currentUser } = useContext(AuthContext);
@@ -71,7 +70,7 @@ function EdycjaProfilu() {
     getProfileDescription(currentUser.uid)
       .then((userDescription) => {
         setDescription(userDescription);
-        setTempDescription(userDescription); // Kopiowanie do tempDescription
+        setTempDescription(userDescription);
         setIsUserDataLoaded(true);
       });
   }, [currentUser]);
@@ -177,18 +176,7 @@ function EdycjaProfilu() {
         />
         <span className="displayName">{currentUser.displayName}</span>
         <br></br>
-        <select
-          value={odbiorcaId}
-          onChange={(e) => setOdbiorcaId(e.target.value)}
-        >
-          <option key="" value="">Wybierz odbiorcę</option>
-          {uzytkownicy.map(user => (
-            <option key={user.UserUID} value={user.UserUID}>{user.UserName}</option>
-          ))}
-        </select>
-        <button className="sendMsg" onClick={changeBan}>
-          <h2>Blokowanie/Odblokowanie</h2>
-        </button>
+
         {isEditingDescription ?  (
   <div className='editText'>
     <textarea
@@ -209,6 +197,25 @@ function EdycjaProfilu() {
 ) : (
   <div className='description'>Ładowanie opisu profilu...</div>
 )}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+  <select
+    value={odbiorcaId}
+    onChange={(e) => setOdbiorcaId(e.target.value)}
+    style={{ marginBottom: '10px' }}
+  >
+    <option key="" value="">
+      Wybierz użytkownika
+    </option>
+    {uzytkownicy.map((user) => (
+      <option key={user.UserUID} value={user.UserUID}>
+        {user.UserName}
+      </option>
+    ))}
+  </select>
+  <button className="sendMsg" onClick={changeBan}>
+    <h2>Blokowanie/Odblokowanie</h2>
+  </button>
+</div>
         <input
           type="file"
           accept="image/*"
@@ -217,6 +224,7 @@ function EdycjaProfilu() {
           ref={fileInputRef}
         />
       </div>
+      
       <UserPostsFetcher/>
     </div>
   );

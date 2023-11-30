@@ -36,23 +36,14 @@ function Panel() {
 
     return (
       <div className="panel">
-        
-        { /* zakladka w panelu 1 */ }
-        <Link to="/"> {/* Ścieżka do głównej strony */}
+        <Link to="/">
           <Zakladka Ikonka={HomeIcon} tekst="Główna" />
         </Link>
   
-        { /* zakladka w panelu 2 */ }
-        {/* <Link to="/wiadomosci"> { Ścieżka do strony z wiadomościami */}
           <Zakladka Ikonka={MailOutlineIcon} tekst="Wiadomości" onClick={messagePage}/>
-        {/* </Link> */}
-  
-        { /* zakladka w panelu 3 */ }
-        {/* <Link to="/profil"> {} */}
+
           <Zakladka Ikonka={PersonIcon} tekst="Profil" onClick={profilePage}/>
-        {/* </Link> */}
-  
-        { /* Przycisk - dodaj wpis */ }
+
         <Zakladka Ikonka={LogoutIcon} tekst="Wyloguj" onClick={handleLogout} />
       </div>
     );

@@ -26,7 +26,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app); 
 
-// userUID - IdProfilu, userID - nasze id
 async function removeFollow(userUID, userID) {
   try {
     const q = query(collection(db, 'user'), where("UserUID", "==", userUID));
@@ -39,7 +38,6 @@ async function removeFollow(userUID, userID) {
         const currentFollow = documentSnapshot.data().Follow || {};
 
         if (currentFollow[userID]) {
-          // Jeżeli follow już istnieje, usuwamy go
           delete currentFollow[userID];
 
           const reactionRef = doc(db, 'user', documentSnapshot.id);
@@ -98,19 +96,16 @@ async function changeBlocked(userUID, userID) {
         const currentBan = documentSnapshot.data().Blocked || {};
 
         if (currentBan[userUID]) {
-          // Jeżeli Blokada już istnieje, usuwamy go
           delete currentBan[userUID];
 
           const reactionRef = doc(db, 'user', documentSnapshot.id);
           await updateDoc(reactionRef, { Blocked: currentBan });
           return true;
         } else {
-          // Jeżeli Blokada nie istnieje, dodajemy go
           currentBan[userUID] = 'Blocked';
 
           const reactionRef = doc(db, 'user', documentSnapshot.id);
           await updateDoc(reactionRef, { Blocked: currentBan });
-          // oraz zdejmujemy mu followa
           await removeFollow(userUID,userID);
           return true;
         }
@@ -147,17 +142,10 @@ async function checkFollow(userUID, userID) {
 
 async function getPostFollow(collectionName, userUid) {
   try {
-    // Pobierz tablicę Follow
     const followArray = await getFollowArray(userUid);
-
-    // Przygotuj zapytanie do kolekcji
     const Collection = collection(db, collectionName);
     const q = query(Collection, where("UID", "in", Object.keys(followArray)), orderBy("Timestamp", "desc"), limit(5));
-
-    // Pobierz Snapshot
     const Snapshot = await getDocs(q);
-
-    // Przetwórz dane
     const List = Snapshot.docs.map((doc) => {
       const docID = doc.id;
       const docData = doc.data();
@@ -226,14 +214,12 @@ async function addFollow(userUID, userID) {
         const currentFollow = documentSnapshot.data().Follow || {};
 
         if (currentFollow[userID]) {
-          // Jeżeli follow już istnieje, usuwamy go
           delete currentFollow[userID];
 
           const reactionRef = doc(db, 'user', documentSnapshot.id);
           await updateDoc(reactionRef, { Follow: currentFollow });
           return true;
         } else {
-          // Jeżeli follow nie istnieje, dodajemy go
           currentFollow[userID] = 'Follow';
 
           const reactionRef = doc(db, 'user', documentSnapshot.id);
@@ -299,8 +285,7 @@ function addNewPost(collectionName, postData) {
   }
 
   try {
-    const newPostRef = addDoc(postsCol, postData);
-    window.location.reload();
+    addDoc(postsCol, postData);
     return true;
   } catch (error) {
     return false;
@@ -353,17 +338,16 @@ async function GetCom(collectionName, idWpisu) {
   return List;
 }
 
-//Dodawanie avatara do profilu
 async function uploadAvatar(file, currentUser) {
   const fileRef = ref(storage, currentUser.uid + '.png');
 
   try {
     await uploadBytes(fileRef, file);
     const photoURL = await getDownloadURL(fileRef);
-    return photoURL; // Zwracaj photoURL
+    return photoURL;
   } catch (error) {
     console.error('Błąd podczas przesyłania avatara:', error);
-    throw error; // Rzuć błąd w przypadku problemu
+    throw error;
   }
 }
 
@@ -379,7 +363,6 @@ export const getAvatarFromStorage = async (user) => {
   }
 };
 
-// dodawanie reakcji do wpisow
 async function addReaction(collectionName, itemID, userID, reactionType) {
   const reactionRef = doc(db, collectionName, itemID);
 
@@ -421,26 +404,25 @@ async function getReactionsFromDatabase(postId, userId) {
   }
 }
 
-// to nie dziala jeszcze
-async function removeReaction(collectionName, itemID, userID, reactionType) {
-  const reactionRef = doc(db, collectionName, itemID);
+// async function removeReaction(collectionName, itemID, userID, reactionType) {
+//   const reactionRef = doc(db, collectionName, itemID);
 
-  try {
-    const documentSnapshot = await getDoc(reactionRef);
+//   try {
+//     const documentSnapshot = await getDoc(reactionRef);
 
-    if (documentSnapshot.exists()) {
-      const currentReactions = documentSnapshot.data().Reactions || {};
+//     if (documentSnapshot.exists()) {
+//       const currentReactions = documentSnapshot.data().Reactions || {};
 
-      if (currentReactions[userID] === reactionType) {
-        delete currentReactions[userID];
+//       if (currentReactions[userID] === reactionType) {
+//         delete currentReactions[userID];
 
-        await updateDoc(reactionRef, { Reactions: currentReactions });
-      }
-    }
-  } catch (error) {
-    console.error('Błąd podczas usuwania reakcji:', error);
-  }
-}
+//         await updateDoc(reactionRef, { Reactions: currentReactions });
+//       }
+//     }
+//   } catch (error) {
+//     console.error('Błąd podczas usuwania reakcji:', error);
+//   }
+// }
 
 function formatTime(date) {
   if (date instanceof Date) {
@@ -461,10 +443,10 @@ async function uploadBackground(file, currentUser) {
   try {
     await uploadBytes(fileRef, file);
     const backgroundURL = await getDownloadURL(fileRef);
-    return backgroundURL; // Zwracaj backgroundURL
+    return backgroundURL;
   } catch (error) {
     console.error('Błąd podczas przesyłania tła:', error);
-    throw error; // Rzuć błąd w przypadku problemu
+    throw error;
   }
 }
 
@@ -520,7 +502,7 @@ export const auth = getAuth(app);
 export const storage = getStorage();
 
 
-export {checkBlocked, changeBlocked, checkFollow, getPostFollow, addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, removeReaction, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
+export {checkBlocked, changeBlocked, checkFollow, getPostFollow, addFollow, getUserUid, addNewUser, getPost, addNewPost, addCom, updatePost, deletePost, getReactionsFromDatabase, addReaction, formatTime, GetCom, uploadAvatar, uploadBackground, getUserName };
 
 
 export default app;

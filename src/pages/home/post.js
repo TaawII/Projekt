@@ -14,7 +14,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import { Avatar } from "@mui/material"
-import { addReaction, getReactionsFromDatabase, removeReaction, addRetweet, removeRetweet } from '../../firebase';
+import { addReaction, getReactionsFromDatabase, addRetweet, removeRetweet } from '../../firebase';
 import { formatDistanceToNow } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { getStorage, ref, getDownloadURL } from "firebase/storage"; 
@@ -34,7 +34,6 @@ function Post({ post }) {
   const [reactions, setReactions] = useState({ like: 0 });
   const [userPhotoURL, setUserPhotoURL] = useState(''); 
   const [isRetweeted, setIsRetweeted] = useState(false);
-  const [isShared, setIsShared] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
 
   const currentUserUID = currentUser.uid;
@@ -49,7 +48,6 @@ function Post({ post }) {
       };
       await addRetweet('retweets', RetweetData);
       setIsRetweeted(true);
-      setIsShared(true);
       localStorage.setItem(`retweet_${post.id}`, 'true');
       setAlertOpen(true);
       setTimeout(() => {
@@ -175,15 +173,7 @@ function Post({ post }) {
     const reactionType = 'lubie';
     const userID = currentUser.uid;
 
-    if (reactions[reactionType]) {
-      try {
-        await removeReaction('wpisy', post.id, userID, reactionType);
-        const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);
-        setReactions(fetchedReactions);
-      } catch (error) {
-        console.error('Błąd podczas usuwania reakcji:', error);
-      }
-    } else {
+    if (!reactions[reactionType]) {
       try { 
         await addReaction('wpisy', post.id, userID, reactionType);
         const fetchedReactions = await getReactionsFromDatabase(post.id, currentUserUID);

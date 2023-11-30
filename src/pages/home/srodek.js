@@ -9,7 +9,6 @@ function Srodek(){
     return(
         <div className="srodek">
 
-        {/* naglowek */}
         <div className="srodek-naglowek">
             <h2>Witaj {currentUser.displayName}! </h2>
         </div>
